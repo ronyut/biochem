@@ -79,7 +79,7 @@ $questionName = getValueFromDB("SELECT * FROM phrases WHERE pID = $id AND isQues
         <?php
         $i = 1;
         foreach($tags as $tagID => $tagName) {
-            echo '<h2><a href="tag.php?id='.$tagID.'">'.$tagName.'</a></h2>';
+            echo '<h2>'.$tagName.'</h2>';
             if(sizeof($tags) != $i) {
                 echo ' <span class="bullet">•</span> ';
             }

@@ -273,5 +273,18 @@
         $output .= "</script>";
         return $output;
     }
+    
+    /**************************************************************
+        cleanWords:
+        cleanWords
+	**************************************************************/
+    function cleanWords($words) {
+        $newArr = array();
+        foreach($words as $word){
+            $clean = trimmer($word);
+            array_push($newArr);
+        }
+    return $newArr;
+}
 
 ?>

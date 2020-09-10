@@ -98,6 +98,7 @@ require("inc/functions.php");
 </head>
 
 <body>
+    <?php if (isset($_GET['all'])) { ?>
     <div align="center" class="tags-search-wrapper">
     <div class="tags-search">
     <?php
@@ -116,8 +117,8 @@ require("inc/functions.php");
     </div>
     <div id="cnt-visible-wrapper"><span id="cnt_visible"></span> תוצאות</div>
     </div>
-    
     <?php
+    }
     
     $i = 1;
     $query0 = query("SELECT * FROM phrases WHERE isQuestion = 1");
