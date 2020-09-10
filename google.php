@@ -17,13 +17,13 @@ require("inc/functions.php");
     <title>ביוכימיה - שחזורים</title>
 
     <style>
-    article h1
+    h1
     {
         font-size:32px;
         width: 100%;
     }
     
-    article h2 {
+    h2 {
         font-size: 26px;
     }
     
@@ -92,31 +92,7 @@ require("inc/functions.php");
     #cnt-visible-wrapper{
         margin-top: 20px;
     }
-    
-    .google{
-        width: 80%;
-    }
-    
-    #googleForm {
-        position: fixed;
-        top: 0;
-        padding: 20px;
-        background: purple;
-        left: 0;
-        z-index: 10000;
-    }
-    
-    .highlight{
-        background: yellow;
-    }
-    
-    .scroll-to{
-        color:white;
-    }
-    
-    .scroll-to:hover{
-        color:yellow;
-    }
+
     </style>
 
 </head>
@@ -146,15 +122,6 @@ require("inc/functions.php");
     ?>
     </div>
     <div id="cnt-visible-wrapper"><span id="cnt_visible"></span> תוצאות</div>
-    <br>
-    <form id="googleForm" class="draggable">
-      <div class="form-group">
-        <input type="text" class="google form-control" id="google" placeholder="חפש בגוגל">
-      </div>
-      <button type="submit" class="btn btn-primary">חיפוש</button>
-      <button type="reset" onclick="clearGoogleResults()" class="btn btn-default">נקה</button>
-      <div class="google-results"></div>
-    </form>
     </div>
     <?php
     }
@@ -183,7 +150,6 @@ require("inc/functions.php");
     }
     ?>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <script src="js/bootstrap-tagsinput.js"></script>

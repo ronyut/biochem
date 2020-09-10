@@ -1,6 +1,7 @@
 var MAX_VISIBLE_TAGS = 30;
 
 init();
+let limitTags = false;
 
 function init(){
     refreshCount();
@@ -10,6 +11,10 @@ function refreshCount() {
     let cnt = $(".article-container[show=true]").length;
     $("#cnt_visible").text(cnt);
 }
+
+$(document).on('click', '#showAllTags', function (e) {
+    limitTags = !limitTags;
+});
 
 // Remove tag by ctrl+right click
 $(document).on('click', '.tag-link', function (e) {
@@ -109,14 +114,85 @@ function validate(tid) {
             
         }
         
-        if (i > MAX_VISIBLE_TAGS && $(".tag-link:not(.tag-active):not(.hidden)").length > MAX_VISIBLE_TAGS) {
-            $(".tag-link[tid="+fil+"]").addClass("hidden");
+        if(limitTags){
+            if (i > MAX_VISIBLE_TAGS && $(".tag-link:not(.tag-active):not(.hidden)").length > MAX_VISIBLE_TAGS) {
+                $(".tag-link[tid="+fil+"]").addClass("hidden");
+            }
         }
         
         i++;
     }
+}
+
+function clearGoogleResults() {
+    $(".google-results").html("");
     
+    $(".highlight").contents().unwrap();
+}
+
+// search "google"
+$("#googleForm").submit(function(e) {
+    e.preventDefault();
+    let query = $("#google").val();
+    clearGoogleResults();
+
+    if(query == "") {
+        return;
+    }
     
+    $.ajax({
+        method: "POST",
+        url: "inc/find.php",
+        data: { query: $("#google").val(), _s: Math.random() },
+        dataType: 'json',
+        cache: false,
+        success: function (results) {
+            let output = "<hr>";
+            let i = 1;
+            for(let res in results) {
+                let id = results[res].id;
+                let score = results[res].score;
+                if(score == 0) {
+                    continue;
+                }
+                
+                let highlights = results[res].highlight;
+                $(".article-container[pid="+id+"] .phrase").each(function(i, el){
+                    let html = $(el).html();
+                    for(let high in highlights) {
+                        let hl = highlights[high];
+                        if(html.includes(hl)) {
+                            html = replaceAll(html, hl, "<span class='highlight'>"+hl+"</span>");
+                        }
+                    }
+                    $(el).html(html);
+                });
+                
+                output += "<h"+i+"><a href='#' class='scroll-to' pid='"+id+"'>תוצאה "+i+"</a></h"+i+">";
+                i++;
+            }
+            $(".google-results").html(output);
+            $(".scroll-to:first").click(); // scroll to result
+        },
+        error: function(msg) {
+            alert("No response");
+        }
+    });
+});
+
+$(document).on('click', '.scroll-to', function (e) {
+    let id = $(this).attr("pid");
+    $([document.documentElement, document.body]).animate({
+        scrollTop: $(".article-container[pid="+id+"]").offset().top
+    }, 250);
+});
+
+function escapeRegExp(string) {
+  return string.replace(/[.*+\-?^${}()|[\]\\]/gi, '\\$&'); // $& means the whole matched string
+}
+
+function replaceAll(str, find, replace) {
+  return str.replace(new RegExp(escapeRegExp(find), 'gi'), replace);
 }
 
 // enable tags
@@ -144,3 +220,5 @@ $('.tags-input').tagsinput({
         source: tags.ttAdapter()
     }
 });
+
+$(".draggable").draggable();

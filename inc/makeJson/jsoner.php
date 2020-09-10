@@ -6,6 +6,9 @@ require("../functions.php");
 $json = file_get_contents("synonyms.json");
 $json = json_decode($json);
 
+$stopwords = file_get_contents("stopwords.json");
+$stopwords = json_decode($stopwords);
+
 $i = 0;
 $allVars = array();
 foreach($json as $group) {
@@ -17,32 +20,44 @@ foreach($json as $group) {
 
 $results = array();
 
-$query = query("SELECT * FROM phrases LIMIT 50");  // <<<---------------@@@@@@@@@@@
+$query = query("SELECT * FROM phrases");  // <<<---------------@@@@@@@@@@@
 while($row = mysqli_fetch_array($query)) {
     $text = trimmer($row["phraseName"]);
-    $replace = [",", "-", "?", ".", "(", ")", "+", ":", "="];
+    $replace = [",", "-", "?", ".", "(", ")", "+", ":", "=", "/", "\\"];
     $clean = str_replace($replace, " ", $text);
     $clean = trimmer($clean);
     $words = explode(" ", $clean);
-    
-    $allWordsWithSyns = $words;
+    $words = array_unique($words);
+        
+    $lvl1 = array();
     foreach($words as $word) {
-        $syns = (array) getSynonyms($word, $allVars);
-        $allWordsWithSyns = array_merge($allWordsWithSyns, $syns);
-    }
-    $allWordsWithSyns = array_unique($allWordsWithSyns);
-    
-    // explode each word
-    $lvl2 = array();
-    foreach($allWordsWithSyns as $word) {
+        // remove single hebrew letters
         if(mb_strlen($word) == 1 && !is_numeric($word) && !ctype_alpha($word)) {
             continue;
         }
-        $boom = explode(" ", $word);
-        $lvl2 = array_merge($lvl2, $boom);
+        
+        if (!in_array($word, $stopwords)) {
+            array_push($lvl1, $word);
+        }
     }
-    $lvl2 = array_unique($lvl2);
-    
+        
+    $allWordsWithSyns = $lvl1;
+    foreach($lvl1 as $word) {
+        $syns = (array) getSynonyms($word, $allVars);
+        
+        // explode each word
+        $lvl2 = array();
+        foreach($syns as $syn) {
+            $boom = explode(" ", $syn);
+            $lvl2 = array_merge($lvl2, $boom);
+        }
+        
+        // skip empty arrays
+        if(sizeof($lvl2) > 0){
+            array_push($allWordsWithSyns, (array) $syns);
+        }
+    }
+        
     $id = $row["answerOf"];
     if($id == null) {
         $id = $row["pID"];
@@ -52,15 +67,18 @@ while($row = mysqli_fetch_array($query)) {
         $results[$id] = array();
     }
     
-    $results[$id] = array_merge($results[$id], $lvl2);
+    $results[$id] = array_merge($results[$id], $allWordsWithSyns);
 }
 
+/*
 $final = array();
 foreach($results as $id => $res) {
     $final[$id] = array_unique($res);
-}
+}*/
 
 function getSynonyms($word, $array) {
+    $max = 0;
+    $i = 0;
     foreach ($array as $group) {
         foreach ($group as $val) {
             if ($val === $word) {
@@ -69,15 +87,23 @@ function getSynonyms($word, $array) {
                 if(mb_strlen($word) >= 2 && mb_strlen($val) >= 2) {
                     $sim = similar_text($val, $word, $perc);
                     if($perc > 85) {
-                        return $group;
+                        $max = $i;
                     }
                 }
             }
         }
+        $i += 1;
     }
-    return null;
+    
+    if ($max == 0) {
+        return null;
+    } else {
+        return $array[$max];
+    }
 }
 
 header('Content-Type: application/json');
-echo json_encode($final, JSON_UNESCAPED_UNICODE);
+echo $outputJson = json_encode($results, JSON_UNESCAPED_UNICODE);
+
+file_put_contents("../analyzed.json", $outputJson);
 ?>

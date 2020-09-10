@@ -29,6 +29,14 @@
     }
     
     /**************************************************************
+		compareScore:
+		Compare which number is bigger
+	**************************************************************/
+    function compareScore($a, $b) {
+        return $a["score"] < $b["score"];
+    }
+    
+    /**************************************************************
 		intToBool:
 		Int to bool
 	**************************************************************/
@@ -234,11 +242,11 @@
         getAllTags:
         Get an array of all tags
 	**************************************************************/
-    function getAllTags() {
+    function getAllTags($orderBy = "cnt DESC") {
         $query = query("SELECT tags.tagID, tags.tagName, count(tag2phrase.tagID) AS cnt FROM `tags`
                         JOIN tag2phrase ON tags.tagID = tag2phrase.tagID
                         GROUP BY tag2phrase.tagID
-                        ORDER BY cnt DESC");
+                        ORDER BY $orderBy");
         
         $tags = array();
         while($row = mysqli_fetch_array($query)){

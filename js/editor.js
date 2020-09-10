@@ -27,7 +27,6 @@ $('.tags-input').on('beforeItemAdd', function(event) {
 
 // remove tag
 $('.tags-input').on('itemRemoved', function(event) {
-    return;
     $.ajax({
         method: "POST",
         url: "inc/ajax.php?action=removeTag",
