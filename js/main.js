@@ -1,88 +1,122 @@
-// active and inactive questions down in page
-let activeDown = [];
-let inactiveDown = [];
-// active and inactive questions down in page
-let activeUp = [];
-let inactiveUp = [];
+var MAX_VISIBLE_TAGS = 30;
 
 init();
 
 function init(){
-    $(".tags-active .tag-link.really").each(function(i, element){
-        let tid = $(element).attr("tid");
-        activeUp.push(tid);
-        activeDown.push(tid);
-    });
+    refreshCount();
+}
+
+function refreshCount() {
+    let cnt = $(".article-container[show=true]").length;
+    $("#cnt_visible").text(cnt);
 }
 
 // Remove tag by ctrl+right click
 $(document).on('click', '.tag-link', function (e) {
-    $(this).removeClass("really").addClass("not-really");
     let name = $(this).text();
     let tid = $(this).attr("tid");
-    let isActive = $(this).hasClass("tag-active");
+    let letsDisable = $(this).hasClass("tag-active");
     
-    // if going to be inactive
-    if(isActive) {
-        $(".tags-inactive .tag-link[tid="+tid+"]").removeClass("not-really").addClass("really");
-        inactiveUp.push(tid);
-        activeUp.splice(activeUp.indexOf(tid), 1);
-    } else {
-        $(".tags-active .tag-link[tid="+tid+"]").removeClass("not-really").addClass("really");
-        activeUp.push(tid);
-        inactiveUp.splice(activeUp.indexOf(tid), 1);
-    }
+    $(this).toggleClass("tag-active");
+    
     
     $(".tags-input").each(function(i, el){
-        let tags = $(el).tagsinput('items');
-        if (tags.some(e => e.tid == tid)) {
-            let container = $(el).closest(".article-container");
-            if (isActive) {
-                container.attr("show", "false");
-                
-                for(let tag in tags) {
-                    inactiveDown.push(tags[tag].tid);
-                }
-                
-                activeDown.splice(activeDown.indexOf(tid), 1);
+        let tags = $(el).tagsinput('items');        
+        let container = $(el).closest(".article-container");
+        
+        // if tid not found in tags of this question 
+        if (typeof tags === 'object' && !tags.some(e => e.tid == tid)) {
+             if(!letsDisable) {
+                container.attr("show", "false"); // not found id + we want to enable filter  -> bye
             } else {
-                container.attr("show", "true");
-                for(let tag in tags) {
-                    activeDown.push(tags[tag].tid);
+                let arr = [];
+                for (let tag in tags){
+                    arr.push(tags[tag].tid);
                 }
-                inactiveDown.splice(inactiveDown.indexOf(tid), 1);
+                
+                if(letsDisable) {
+                    let filters = getActiveFilters();
+                    let count = 0;
+                    for (let filter in filters){
+                        if (arr.includes(parseInt(filters[filter]))) {
+                            count += 1;
+                        }
+                    }
+                    
+                    if(count == filters.length) {
+                        container.attr("show", "true"); // not found id + want to disable -> show
+                    } else {
+                        container.attr("show", "false");
+                    }
+                }
             }
         }
     });
     
-    validate(tid, activeDown, inactiveDown, activeUp, inactiveUp);
+    validate(tid);
+    refreshCount();
 });
 
+function getActiveFilters() {
+    let filters = $(".tag-active");
+    let ids = [];
+    filters.each(function(i, el){
+        ids.push($(el).attr("tid"));
+    });
+    
+    return ids;
+}
+
+function getInactiveFilters() {
+    let filters = $(".tag-link:not(.tag-active)");
+    let ids = [];
+    filters.each(function(i, el){
+        ids.push($(el).attr("tid"));
+    });
+    
+    return ids;
+}
+
 // validate tags in the filter control
-function validate(tid, activeDown, inactiveDown, activeUp, inactiveUp) {
+function validate(tid) {
     
-    /*console.log(activeUp);
-    console.log(inactiveUp);
-    console.log(inactiveDown);
-    console.log(inactiveDown);*/
+    let inactive = getInactiveFilters();
     
-    // Active
-    for(let tid in activeUp) {
-        if (!activeDown.includes(tid)) {
-            $(".tags-active .tag-link[tid="+tid+"]").removeClass("really").addClass("not-really");
-            $(".tags-inactive .tag-link[tid="+tid+"]").removeClass("not-really").addClass("really");
-        }
+    let tags = $(".article-container[show=true] .tags-input").tagsinput('items');
+    let y = [];
+
+    if ($(".article-container[show=true]").length > 1){
+        // convert object of arrays of objects to: array of objects
+        tags.forEach(arr => {
+            for (let obj in arr){
+                y.push(arr[obj]);
+            }
+        });
+    } else {
+        y = tags;
     }
     
-    // Inactive
-    for(let tid in inactiveUp) {
-        if (!inactiveDown.includes(tid)) {
-            $(".tags-inactive .tag-link[tid="+tid+"]").removeClass("really").addClass("not-really");
-            $(".tags-active .tag-link[tid="+tid+"]").removeClass("not-really").addClass("really");
+    let i = 0;
+    for (let filter in inactive){
+        let fil = parseInt(inactive[filter]);
+
+        if (typeof y === 'object'){
+            if (!y.some(e => e.tid == fil)) {
+                $(".tag-link[tid="+fil+"]").addClass("hidden");
+            } else {
+                $(".tag-link[tid="+fil+"]").removeClass("hidden");
+            }
+            
         }
+        
+        if (i > MAX_VISIBLE_TAGS && $(".tag-link:not(.tag-active):not(.hidden)").length > MAX_VISIBLE_TAGS) {
+            $(".tag-link[tid="+fil+"]").addClass("hidden");
+        }
+        
+        i++;
     }
     
-    console.log("done!");
+    
 }
 
 // enable tags

@@ -56,7 +56,10 @@ require("inc/functions.php");
     }
     
     .tags-search {
-        width: 90%;
+        width: 80%;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
     }
     
     .tag-link{
@@ -68,12 +71,6 @@ require("inc/functions.php");
         display:none;
     }
     
-    .tags-active {
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-    }
-    
     .tags-inactive {
         background: black;
         padding: 20px;
@@ -83,33 +80,41 @@ require("inc/functions.php");
     .article-container[show=false]{
         display:none;
     }
+    
+    .tag-active{
+        border: 4px solid black;
+    }
+    
+    #cnt_visible{
+        font-weight: bold;
+    }
+    
+    #cnt-visible-wrapper{
+        margin-top: 20px;
+    }
+
     </style>
 
 </head>
 
 <body>
-    <div class="tags-search-wrapper">
+    <div align="center" class="tags-search-wrapper">
     <div class="tags-search">
-        <div class="tags-active">
-        <?php
-            $tags = getAllTags();
-            foreach($tags as $tag => $details) {
-                echo "<button dir='auto' type='button' class='btn tag-active tag-link really'
-                        style='background-color:".$details['color']."' tid='".$tag."'>".$details['name']."</button>";
+    <?php
+        $tags = getAllTags();
+        $i = 0;
+        foreach($tags as $tag => $details) {
+            $hidden = "";
+            if ($i > 30) {
+                $hidden = "hidden";
             }
-        ?>
-        </div>
-        <hr>
-        <div class="tags-inactive">
-        <?php
-            $tags = getAllTags();
-            foreach($tags as $tag => $details) {
-                echo "<button dir='auto' type='button' class='btn tag-inactive tag-link not-really'
-                style='background-color:".$details['color']."' tid='".$tag."'>".$details['name']."</button>";
-            }
-        ?>
-        </div>
+            echo "<button dir='auto' type='button' class='btn tag-link $hidden'
+                    style='background-color:".$details['color']."' tid='".$tag."'>".$details['name']."</button>";
+            $i++;
+        }
+    ?>
     </div>
+    <div id="cnt-visible-wrapper"><span id="cnt_visible"></span> תוצאות</div>
     </div>
     
     <?php
