@@ -69,15 +69,14 @@
 		"term": "CPS1",
 		"variants": [
 			"CPS-I",
-			" CPS I",
+			"CPS I",
 			"CPS-1"
 		]
 	},
 	{
 		"term": "CoA",
 		"variants": [
-			"קו A",
-			"קו-A"
+			"קו A"
 		]
 	},
 	{
@@ -133,7 +132,7 @@
 	{
 		"term": "G1P",
 		"variants": [
-			" Glucose 1-phosphate",
+			"Glucose 1-phosphate",
 			"G-1-P",
 			"גלוקוז-1-פוספט"
 		]
@@ -202,7 +201,7 @@
 	{
 		"term": "PFK",
 		"variants": [
-			" Phosphofructokinase",
+			"Phosphofructokinase",
 			"פוספופרוקטוקינאז",
 			"פוספו פרוקטו קינאז"
 		]
@@ -662,16 +661,6 @@
 		"variants": "אאוקריוט"
 	},
 	{
-		"term": "לא",
-		"variants": [
-			"אינם",
-			"אינה",
-			"אינו",
-			"איננו",
-			"איננה"
-		]
-	},
-	{
 		"term": "לא תחרותי",
 		"variants": "noncompetitive"
 	},
@@ -760,10 +749,6 @@
 	{
 		"term": "סרין",
 		"variants": "Serine"
-	},
-	{
-		"term": "ע\"י",
-		"variants": "על ידי"
 	},
 	{
 		"term": "עמילז",

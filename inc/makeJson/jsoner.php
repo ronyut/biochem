@@ -1,7 +1,7 @@
 ﻿<?php
 
-require("config.php");
-require("functions.php");
+require("../config.php");
+require("../functions.php");
 
 $json = file_get_contents("synonyms.json");
 $json = json_decode($json);
@@ -15,10 +15,12 @@ foreach($json as $group) {
     $i++;
 }
 
-$query = query("SELECT * FROM phrases");
+$results = array();
+
+$query = query("SELECT * FROM phrases LIMIT 50");  // <<<---------------@@@@@@@@@@@
 while($row = mysqli_fetch_array($query)) {
     $text = trimmer($row["phraseName"]);
-    $replace = [",", "-", "?", ".", "(", ")", "+"];
+    $replace = [",", "-", "?", ".", "(", ")", "+", ":", "="];
     $clean = str_replace($replace, " ", $text);
     $clean = trimmer($clean);
     $words = explode(" ", $clean);
@@ -33,12 +35,29 @@ while($row = mysqli_fetch_array($query)) {
     // explode each word
     $lvl2 = array();
     foreach($allWordsWithSyns as $word) {
+        if(mb_strlen($word) == 1 && !is_numeric($word) && !ctype_alpha($word)) {
+            continue;
+        }
         $boom = explode(" ", $word);
         $lvl2 = array_merge($lvl2, $boom);
     }
     $lvl2 = array_unique($lvl2);
     
-    var_dump($lvl2);
+    $id = $row["answerOf"];
+    if($id == null) {
+        $id = $row["pID"];
+    }
+    
+    if(!array_key_exists($id, $results)){
+        $results[$id] = array();
+    }
+    
+    $results[$id] = array_merge($results[$id], $lvl2);
+}
+
+$final = array();
+foreach($results as $id => $res) {
+    $final[$id] = array_unique($res);
 }
 
 function getSynonyms($word, $array) {
@@ -47,9 +66,11 @@ function getSynonyms($word, $array) {
             if ($val === $word) {
                 return $group;
             } else {
-                $sim = similar_text($val, $word, $perc);
-                if($perc > 85) {
-                    return $group;
+                if(mb_strlen($word) >= 2 && mb_strlen($val) >= 2) {
+                    $sim = similar_text($val, $word, $perc);
+                    if($perc > 85) {
+                        return $group;
+                    }
                 }
             }
         }
@@ -57,6 +78,6 @@ function getSynonyms($word, $array) {
     return null;
 }
 
-//header('Content-Type: application/json');
-//echo json_encode($json);
+header('Content-Type: application/json');
+echo json_encode($final, JSON_UNESCAPED_UNICODE);
 ?>
