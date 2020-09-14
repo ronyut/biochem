@@ -124,11 +124,11 @@
             $editable = "contenteditable='true'";
         }
         
-        $i = 1;
+        $i = 0;
         $query = query("SELECT * FROM phrases WHERE pID = $id OR answerOf = $id ORDER BY pID ASC");
         while($row = mysqli_fetch_array($query)){
             // question
-            if ($i == 1) {
+            if ($i == 0) {
                 $name = $row["phraseName"];
                 $nos = array("לא", "ללא", "אינו", "אינם", "אינה", "איננו", "איננה", "חוץ");
                 foreach($nos as $no){
@@ -137,24 +137,19 @@
                     }
                 }
                 
-                echo "<hr><article><div class='row'><div class='col-md-11'><h1>";
+                echo "<hr><article><h1>";
                 if ($index != null) {
                     echo $index.'. ';
                 }
                 echo "<span class='question phrase' $editable pid='".$row['pID']."'
-                        hash='".md5($row["phraseName"])."' >".$name."</span></h1></div>
-                            <div class='col-md-1'>
-                            <a href='item.php?id=".$row['pID']."' target='_blank'>
-                                <img src='img/link.png' border='0' width='20' height='20'></a>
-                            </div>
-                        </div>
+                        hash='".md5($row["phraseName"])."' >".$name."</span></h1>
                         <hr>
                         <ol>";
                 
             } else {
                 // answer
                 $classAnswer = "incorrect";
-                if ($row['isRight']) {
+                if ($row['isRight'] == 1) {
                     $classAnswer = "correct";
                 }
                 
@@ -170,6 +165,48 @@
             $i++;
         }
         echo "</ol></article>";
+    }
+    
+    /**************************************************************
+		getOneItemJson:
+		Get json of a single item
+	**************************************************************/
+    function getOneItemJson($id, $index, $isEditable) {
+        $i = 0;
+        $json = array();
+        $query = query("SELECT * FROM phrases WHERE pID = $id OR answerOf = $id ORDER BY pID ASC");
+        while($row = mysqli_fetch_array($query)){  
+            $json[$i]["comment"] = $row["comment"];
+            $json[$i]["pid"] = (int) $row["pID"];
+            
+            // question
+            if ($i == 0) {
+                $name = $row["phraseName"];
+                $nos = array("לא", "ללא", "אינו", "אינם", "אינה", "איננו", "איננה", "חוץ");
+                foreach($nos as $no){
+                    if (contains($row["phraseName"], $no." ")) {
+                        $name = str_replace($no." ", "<span class='red'>$no</span> ", $name);
+                    }
+                }
+                
+                $json[$i]["type"] = "q";
+                
+            } else {
+                $name = $row["phraseName"];
+                // answer
+                $json[$i]["type"] = "a";
+
+                if ($row['isRight'] == 1) {
+                    $json[$i]["correct"] = true;
+                } else {
+                    $json[$i]["correct"] = false;
+                }
+            }
+            $json[$i]["name"] = $name;
+
+            $i++;
+        }
+        return $json;
     }
     
     /**************************************************************
@@ -282,15 +319,27 @@
         getAllTags:
         Get an array of all tags
 	**************************************************************/
-    function getAllTags($orderBy = "cnt DESC", $where = "") {
-        $query = query("SELECT tags.tagID, tags.tagName, count(tag2phrase.tagID) AS cnt FROM `tags`
-                        JOIN tag2phrase ON tags.tagID = tag2phrase.tagID
-                        GROUP BY tag2phrase.tagID
-                        ORDER BY $orderBy");
+    function getAllTags($isHeat = true) {
+        if($isHeat) {
+            $query = query("SELECT tags.tagID, tags.tagName, count(tag2phrase.tagID) AS cnt FROM `tags`
+                            JOIN tag2phrase ON tags.tagID = tag2phrase.tagID
+                            GROUP BY tag2phrase.tagID
+                            ORDER BY cnt DESC");
+        } else {
+            // by abc
+            $query = query("SELECT * FROM `tags`
+                            ORDER BY tagName ASC");
+        }
         
         $tags = array();
         while($row = mysqli_fetch_array($query)){
-            $tags[$row["tagID"]] = array("name" => $row["tagName"], "count" => $row["cnt"], "color" => countToColor($row["cnt"]));
+            $tagID = (int) $row["tagID"];
+            $temp = array("tid" => $tagID, "name" => $row["tagName"]);
+            if($isHeat) {
+                $temp["count"] = (int) $row["cnt"];
+                $temp["color"] = countToColor($row["cnt"]);
+            }
+            array_push($tags, $temp);
         }
         return $tags;
     }

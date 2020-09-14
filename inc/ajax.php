@@ -2,6 +2,8 @@
 
 require("config.php");
 require("functions.php");
+header('Content-Type: application/json');
+
 
 $status = array("success" => true);
 
@@ -118,18 +120,39 @@ switch($_GET['action']){
         $status = getTagsDataForJS($qid);
         break;
     /*
-        getTagsDataForJS
+        logout
     */
     case "logout":
         require("config-google.php");
-        //Destroy entire session data.
         session_destroy();
+        break;
+    /*
+        getAllTagsForFilter
+    */
+    case "getAllTagsForFilter":
+        $tags = getAllTags(isset($_GET["order"]) && $_GET["order"] == "heat");
+        echo json_encode($tags, JSON_UNESCAPED_UNICODE);
+        exit;
+        break;
+    /*
+        getAllQuestions
+    */
+    case "getAllQuestions":
+        $json = array();
+        $i = 1;
+        $query = query("SELECT * FROM phrases WHERE isQuestion = 1");
+        while($row = mysqli_fetch_array($query)){
+            $qid = $row['pID'];
+            $isEditable = isset($_GET['editable']) && $_GET['editable'] == "true";
+            $item = getOneItemJson($qid, $i, $isEditable);
+            array_push($json, $item);
+        }
+        echo json_encode($json, JSON_UNESCAPED_UNICODE);
+        exit;
         break;
     default:
         break;
 }
 
-header('Content-Type: application/json');
-echo json_encode($status);
-
+echo json_encode($status, JSON_UNESCAPED_UNICODE);
 ?>

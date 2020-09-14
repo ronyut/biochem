@@ -16,5 +16,5 @@ if(empty($query)) {
 $tags = getTagsByName($query);
 
 header('Content-Type: application/json');
-echo json_encode($tags);
+echo json_encode($tags, JSON_UNESCAPED_UNICODE);
 ?>

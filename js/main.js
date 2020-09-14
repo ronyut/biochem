@@ -4,13 +4,19 @@
 let LIMIT_TAGS = false;
 let MAX_VISIBLE_TAGS = 30;
 
-init();
-
 /*
     init on page load
 */
-function init(){
+function pageLoaded(isEditable){
+    initTags();
     refreshCount();
+    setToMaster(isEditable);
+}
+
+function setToMaster(isEditable){
+    if(isEditable) {
+        $('.tags-input').tagsinput()[0].options.isMaster = true;
+    }
 }
 
 /*
@@ -248,81 +254,83 @@ function replaceAll(str, find, replace) {
 /*
     enable tags
 */
-let tags = new Bloodhound({
-  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-  queryTokenizer: Bloodhound.tokenizers.whitespace,
-  identify: function (obj) { return obj.name; },
-  remote: {
-    url: 'inc/tags.php?tag=%QUERY',
-    wildcard: '%QUERY',
-    filter: function (data) {
-                if (data) {
-                    return $.map(data, function (object) {
-                        return { tid: object.tid, name: object.name };
-                    });
-                } else {
-                    return {};
-                }
-            },
-    rateLimitBy: 'debounce',
-    rateLimitWait: 400
-  }
-});
-tags.initialize();
+function initTags() {
+    let tags = new Bloodhound({
+      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+      queryTokenizer: Bloodhound.tokenizers.whitespace,
+      identify: function (obj) { return obj.name; },
+      remote: {
+        url: 'inc/tags.php?tag=%QUERY',
+        wildcard: '%QUERY',
+        filter: function (data) {
+                    if (data) {
+                        return $.map(data, function (object) {
+                            return { tid: object.tid, name: object.name };
+                        });
+                    } else {
+                        return {};
+                    }
+                },
+        rateLimitBy: 'debounce',
+        rateLimitWait: 400
+      }
+    });
+    tags.initialize();
 
-$('.tags-input').tagsinput({
-    tagClass: function(item) {
-        switch (item.approved) {
-            case false : return 'tag-unapproved';
-        }
-    },
-    itemValue: 'tid',
-    itemText: 'name',
-    typeaheadjs: {
-        name: 'tags',
-        displayKey: 'name',
-        keyValue: 'tid',
-        source: tags.ttAdapter()
-    },
-    limit: 100,
-    trimValue: true,
-    supermode: true
-});
-
-/*
+    $('.tags-input').tagsinput({
+        tagClass: function(item) {
+            switch (item.approved) {
+                case false : return 'tag-unapproved';
+            }
+        },
+        itemValue: 'tid',
+        itemText: 'name',
+        typeaheadjs: {
+            name: 'tags',
+            displayKey: 'name',
+            keyValue: 'tid',
+            source: tags.ttAdapter()
+        },
+        limit: 100,
+        trimValue: true,
+        supermode: true
+    });
+    
+    /*
     Fetch the tags
-*/
+    */
 
-let input = $(".tags-input");
-let qid = null;
-if(input.length == 1){
-    qid = input.attr("pid");
+    let input = $(".tags-input");
+    let qid = null;
+    if(input.length == 1){
+        qid = input.attr("pid");
+    }
+
+    $.ajax({
+        method: "GET",
+        url: "inc/ajax.php?action=getTagsDataForJS",
+        dataType: 'json',
+        data: {qid: qid},
+        cache: false,
+        success: function (data) {
+            $.each(data, function(key, value) {
+                let name = this.name;
+                let tid = key;
+                let approved = this.approved;
+                let pids = this.pids;
+                $.each(pids, function(index, pid) {
+                    $('.tags-input[pid='+pid+']').tagsinput('add', {'tid': parseInt(tid), 'name': name, 'approved': approved}, {preventPost: true});
+                });
+            });
+        },
+        error: function(msg) {
+            alert("Error fetching data from server");
+        }
+    });
 }
 
-$.ajax({
-    method: "GET",
-    url: "inc/ajax.php?action=getTagsDataForJS",
-    dataType: 'json',
-    data: {qid: qid},
-    cache: false,
-    success: function (data) {
-        $.each(data, function(key, value) {
-            let name = this.name;
-            let tid = key;
-            let approved = this.approved;
-            let pids = this.pids;
-            $.each(pids, function(key, pid) {
-                $('.tags-input[pid='+pid+']').tagsinput('add', {'tid': parseInt(tid), 'name': name, 'approved': approved}, {preventPost: true});
-            });
-        });
-    },
-    error: function(msg) {
-        alert("Error fetching data from server");
-    }
-});
-
 // add tag
-$('.tags-input').on('beforeItemAdd', function(event) {  
+$(document).on('beforeItemAdd', '.tags-input', function(event) {  
     // dont post tags that are added automatically on page load
     if(event.options && event.options.preventPost) {
         return;
@@ -368,7 +376,7 @@ $('.tags-input').on('beforeItemAdd', function(event) {
     });
 });
 
-$('.tags-input').on('beforeItemAddSuperMode', function(event) {
+$(document).on('beforeItemAddSuperMode', '.tags-input', function(event) {
     let val = event.item;
                     
     if(val == "") {
@@ -431,3 +439,93 @@ $('.dropdown-user .dropdown-item').click(function () {
         });
     }
 });
+
+// load all tags in filter area aysncly
+function putTagsInFilterArea(order) {
+    $.get("inc/ajax.php?action=getAllTagsForFilter&order=" + order, function(data) {
+        let i = 0;
+        let output = "";
+        $.each(data, function(key, value) {
+            let tid = this.tid;
+            let name = this.name;
+            let color;
+            
+            if(order == "heat"){
+                color = this.color;
+            } else {
+                color = `rgb(0,255,`+(255 - i*1.5)+`)`;
+            }
+            
+            output += `<button dir='auto' type='button' class='btn tag-link'
+                       style='background-color:`+ color +`' tid='`+tid+`'>`+name+`</button>`;
+            
+            i++;
+        });
+        $(".tags-search").html(output);
+        $("#articles").html(`<center><br><br><img src="img/flask.gif" width="50" height="50" border="0"></center>`);
+    });
+}
+
+function loadAllQuestions(isEditable) {
+    let urlEditable = "&editable=" + isEditable;
+    
+    $.get("inc/ajax.php?action=getAllQuestions" + urlEditable, function(data) {
+        let i = 0;
+        let output = "";
+        $.each(data, function(index, item) {
+            $.each(item, function(index2, phrase) {
+                let pid = phrase.pid;
+                let name = phrase.name;
+                let comment = phrase.comment;
+                let type = phrase.type;
+
+                let editable = "";
+                if(isEditable == "true") {
+                    editable = "contenteditable='true'";
+                }
+                    
+                // question
+                if(type == "q") {
+                    let qid = pid;
+                    output += `<div class='article-container' pid='`+qid+`' show='true'>
+                                <hr>
+                                <article>
+                                <div class='row'>
+                                <div class='col-md-11'>
+                                <h1>
+                                <span class='question phrase' `+editable+` pid='`+qid+`'
+                                hash='`+$.md5(name)+`' >`+name+`</span></h1></div>
+                                    <div class='col-md-1'>
+                                    <a href='item.php?id=`+qid + urlEditable +`' target='_blank'>
+                                        <img src='img/link.png' border='0' width='20' height='20'></a>
+                                    </div>
+                                </div>
+                                <hr>
+                                <ol>
+                                `;
+                } else {
+                    let classAnswer = "incorrect";
+                    if(phrase.correct) {
+                        classAnswer = "correct";
+                    }
+                    output += `<h2 class='`+classAnswer+`'><li><span class='answer phrase' `+editable+` pid='`+pid+`'
+                          hash='`+$.md5(name)+`'>`+name+`</span></li></h2>`;
+                }
+                if(comment != ""){
+                    output += `<div class='alert alert-warning comment' `+editable+` hash='`+$.md5(comment)+`'
+                            pid='`+pid+`' role='alert'>`+comment+`</div>`;
+                }
+                
+                i++;
+            });
+            
+            output += `     </ol></article>
+                            <div class="tags-container">
+                                <input class="tags-input" pid="`+item[0].pid+`" type="text" data-role="tagsinput">
+                            </div>
+                        </div>`;
+        });
+        $("#articles").html(output);
+        pageLoaded(isEditable == "true");
+    });
+}

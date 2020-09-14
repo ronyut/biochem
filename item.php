@@ -8,6 +8,12 @@ $questionName = getValueFromDB("SELECT * FROM phrases WHERE pID = $id AND isQues
 if (!$questionName) {
     header("Location: $PAGE_NOT_FOUND");
 }
+
+$isEditable = isset($_GET['editable']) && $_GET['editable'] == "true";
+$editable = "false";
+if($isEditable){
+    $editable = "true";
+}
 ?>
 <html lang="he" dir="rtl">
 <head>
@@ -73,7 +79,7 @@ if (!$questionName) {
 <body>
     <div class="article-container" pid="<?=$id?>">
     <?php
-    showItem($id, null, isset($_GET['editable']));
+    showItem($id, null, $isEditable);
     $tags = getTagsByPid($id, false);
     //$tagsStr = implode(",", array_values($tags));
     ?>
@@ -100,11 +106,12 @@ if (!$questionName) {
     <script src="js/typeahead.bundle.js"></script>
     <script src="js/jquery.md5.js"></script>
     <script src="js/main.js"></script>
-    <?php if(isset($_GET["editable"])){ ?>
-    <script src="js/editor.js"></script>
     <script>
-    $('.tags-input').tagsinput()[0].options.isMaster = true;
+    pageLoaded("<?=$editable?>" == "true");
     </script>
+    <?php if($isEditable){ ?>
+    <script src="js/editor.js"></script>
     <?php } ?>
+
 </body>
 </html>

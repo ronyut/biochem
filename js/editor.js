@@ -8,7 +8,7 @@ function defaultSuccess(msg) {
 }
 
 // remove tag
-$('.tags-input').on('itemRemoved', function(event) {
+$(document).on('itemRemoved', '.tags-input', function(event) {
     let pid = $(this).attr("pid");
 
     $.ajax({

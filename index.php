@@ -69,7 +69,7 @@ if(!isset($_SESSION['access_token']))
 }
 
 $user_image = $_SESSION['user_image'];
-
+$editable = isset($_GET["editable"]);
 ?>
 <html lang="he">
 <head>
@@ -149,72 +149,39 @@ $user_image = $_SESSION['user_image'];
     </a>
     
     <div class="page-wrapper">
-    <?php if (!isset($_GET['titles'])) { ?>
-    <div align="center" class="tags-search-wrapper">
-    <div class="tags-search">
-    <?php
-        if(!isset($_GET['heat'])) {
-            $tags = getAllTags("tags.tagName ASC");
-        } else {
-            $tags = getAllTags();
-        }
-        $i = 0;
-        foreach($tags as $tag => $details) {
-            if(isset($_GET['heat'])){
-                echo "<button dir='auto' type='button' class='btn tag-link'
-                        style='background-color:".$details['color']."' tid='".$tag."'>".$details['name']."</button>";
-            } else {
-                echo "<button dir='auto' type='button' class='btn tag-link'
-                    style='background-color:rgb(0,255,".(235 - $i*2).")' tid='".$tag."'>".$details['name']."</button>";
-            }
-            $i++;
-        }
-    ?>
-    </div>
-    <div id="cnt-visible-wrapper"><span id="cnt_visible"></span> תוצאות</div>
-    <br>
-    </div>
-    <?php
-    }
-    
-    $i = 1;
-    $query0 = query("SELECT * FROM phrases WHERE isQuestion = 1");
-    while($row0 = mysqli_fetch_array($query0)){
-        if (isset($_GET['titles'])) {
-            echo "<a href='item.php?id=".$row0['pID']."'>".$row0['phraseName']."</a><hr>";
-        }
-        else
-        {
-            $id = $row0['pID'];
-            echo "<div class='article-container' pid='".$id."' show='true'>";
-            showItem($id, $i, isset($_GET["editable"]));
-            //$tags = getTagsByPid($id);
-            //$tagsStr = implode(",", array_values($tags));
-            ?>
-                <div class="tags-container">
-                    <input class="tags-input" pid="<?=$id?>" type="text" data-role="tagsinput">
-                </div>
+        <div align="center" class="tags-search-wrapper">
+            <div class="tags-search">
+                <img src="img/flask.gif" width="150" height="150" border="0">
             </div>
-            <?php
-        }
-        $i++;
-    }
-    ?>
+            <div id="cnt-visible-wrapper"><span id="cnt_visible">טוען</span> תוצאות</div><br>
+        </div>
+        <div id="articles"></div>
     </div>
+    
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <script src="js/bootstrap-tagsinput.js"></script>
     <script src="js/typeahead.bundle.js"></script>
     <script src="js/jquery.md5.js"></script>
     <script src="js/main.js"></script>
-    <?php if(isset($_GET["editable"])){ ?>
+    <?php
+    $order = "abc";
+    if(isset($_GET['heat'])){
+        $order = "heat";
+    }
+    
+    $isEditable = "false";
+    if($editable){
+        $isEditable = "true";
+    }
+    ?>
+    <script>
+    putTagsInFilterArea("<?=$order?>");
+    loadAllQuestions("<?=$isEditable?>");
+    </script>
+    <?php if($editable){ ?>
     <script src="js/editor.js"></script>
     <?php } ?>
-    <script>
-    // Enable dragging of search window
-    $(".draggable").draggable();
-    </script>
 </body>
 </html>
