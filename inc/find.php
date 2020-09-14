@@ -3,12 +3,13 @@
 require("config.php");
 require("functions.php");
 
-$json = file_get_contents("analyzed.json");
+$json = file_get_contents("makeJson/analyzed.json");
 $json = json_decode($json);
 
 $text = trimmer(escape($_POST["query"]));
-$replace = [",", "-", "?", ".", "(", ")", "+", ":", "=", "'"];
+$replace = [",", "-", "?", ".", "(", ")", "+", ":", "="];
 $clean = str_replace($replace, " ", $text);
+$clean = str_replace("'", "", $text);
 $clean = trimmer($clean);
 $words = explode(" ", $clean);
 
@@ -23,11 +24,12 @@ foreach($json as $id => $values) {
         
         foreach($values as $value) {
             if(!is_array($value)) {
+                $orig = $value;
                 $value = mb_strtolower($value);
                 if ($value === $word) {
                     $score += 100;
                     $log .= $value.", ";
-                    array_push($highlight, $value);
+                    array_push($highlight, $orig);
                 } else {
                     if(mb_strlen($word) >= 2 && mb_strlen($value) >= 2
                        && !is_numeric($word) && !ctype_alpha($word) && !is_numeric($value) && !ctype_alpha($value)) {

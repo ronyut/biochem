@@ -105,5 +105,5 @@ function getSynonyms($word, $array) {
 header('Content-Type: application/json');
 echo $outputJson = json_encode($results, JSON_UNESCAPED_UNICODE);
 
-file_put_contents("../analyzed.json", $outputJson);
+file_put_contents("analyzed.json", $outputJson);
 ?>

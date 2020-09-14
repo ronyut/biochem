@@ -254,6 +254,10 @@
 			"אדנילט"
 		]
 	},
+    {
+		"term": "אוליגומיצין",
+		"variants": "oligomycin"
+	},
 	{
 		"term": "אוקסידציה",
 		"variants": "oxidation"

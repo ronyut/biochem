@@ -5,6 +5,9 @@ require("inc/functions.php");
 
 $id = (int) $_GET['id'];
 $questionName = getValueFromDB("SELECT * FROM phrases WHERE pID = $id AND isQuestion = 1", "phraseName");
+if (!$questionName) {
+    header("Location: $PAGE_NOT_FOUND");
+}
 ?>
 <html lang="he" dir="rtl">
 <head>
@@ -68,11 +71,13 @@ $questionName = getValueFromDB("SELECT * FROM phrases WHERE pID = $id AND isQues
 </head>
 
 <body>
+    <div class="article-container" pid="<?=$id?>">
     <?php
-    showItem($id, null, true);
+    showItem($id, null, isset($_GET['editable']));
     $tags = getTagsByPid($id, false);
     //$tagsStr = implode(",", array_values($tags));
     ?>
+    </div>
     <footer class="tags-container">
         <input class="tags-input" pid="<?=$id?>" type="text" data-role="tagsinput">
         <br>
@@ -95,7 +100,11 @@ $questionName = getValueFromDB("SELECT * FROM phrases WHERE pID = $id AND isQues
     <script src="js/typeahead.bundle.js"></script>
     <script src="js/jquery.md5.js"></script>
     <script src="js/main.js"></script>
+    <?php if(isset($_GET["editable"])){ ?>
     <script src="js/editor.js"></script>
-    <?=getTagsDataForJS($id)?>
+    <script>
+    $('.tags-input').tagsinput()[0].options.isMaster = true;
+    </script>
+    <?php } ?>
 </body>
 </html>

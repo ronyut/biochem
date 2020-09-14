@@ -1,3 +1,6 @@
+/*
+    Ronyut 12/9/20 added SuperMode
+*/
 (function ($) {
   "use strict";
 
@@ -15,6 +18,8 @@
       return null;
     },
     freeInput: true,
+    supermode: false,
+    isMaster: false, // enables deletion of tags
     addOnBlur: true,
     maxTags: undefined,
     maxChars: undefined,
@@ -94,8 +99,9 @@
             this.add(items[i], true);
           }
 
-          if (!dontPushVal)
+          if (!dontPushVal){
             self.pushVal();
+          }
           return;
         }
       }
@@ -130,8 +136,12 @@
       self.itemsArray.push(item);
 
       // add a tag element
-
-      var $tag = $('<span class="tag ' + htmlEncode(tagClass) + (itemTitle !== null ? ('" title="' + itemTitle) : '') + '">' + htmlEncode(itemText) + '<span data-role="remove"></span></span>');
+      let xicon = '';
+      if(self.options.isMaster) {
+          xicon = '<span data-role="remove"></span>';
+      }
+      
+      var $tag = $('<span dir="auto" class="tag ' + htmlEncode(tagClass) + (itemTitle !== null ? ('" title="' + itemTitle) : '') + '">' + htmlEncode(itemText) + xicon + '</span>');
       $tag.data('item', item);
       self.findInputWrapper().before($tag);
       $tag.after(' ');
@@ -144,8 +154,9 @@
         self.$element.append($option);
       }
 
-      if (!dontPushVal)
-        self.pushVal();
+      if (!dontPushVal){
+          self.pushVal();
+      }
 
       // Add class when reached maxTags
       if (self.options.maxTags === self.itemsArray.length || self.items().toString().length === self.options.maxInputLength)
@@ -262,8 +273,9 @@
 
       self.options = $.extend({}, defaultOptions, options);
       // When itemValue is set, freeInput should always be false
-      if (self.objectItems)
+      if (self.objectItems){
         self.options.freeInput = false;
+      }
 
       makeOptionItemFunction(self.options, 'itemValue');
       makeOptionItemFunction(self.options, 'itemText');
@@ -351,12 +363,21 @@
         self.$input.focus();
       }, self));
 
-        if (self.options.addOnBlur && self.options.freeInput) {
+        if (self.options.addOnBlur && (self.options.freeInput || self.options.supermode)) {
           self.$input.on('focusout', $.proxy(function(event) {
               // HACK: only process on focusout when no typeahead opened, to
               //       avoid adding the typeahead text as tag
-              if ($('.typeahead, .twitter-typeahead', self.$container).length === 0) {
-                self.add(self.$input.val());
+              if ($('.typeahead, .twitter-typeahead', self.$container).length === 0 || self.options.supermode) {
+                
+                if(self.options.supermode) {
+                    // raise beforeItemAddSuperMode arg
+                    let getNewTidEvent = $.Event('beforeItemAddSuperMode', { item: self.$input.val(), self: self });
+                    self.$element.trigger(getNewTidEvent);
+                                         
+                } else {
+                    self.add(self.$input.val());
+                }
+                
                 self.$input.val('');
               }
           }, self));
@@ -375,7 +396,7 @@
         switch (event.which) {
           // BACKSPACE
           case 8:
-            if (doGetCaretPosition($input[0]) === 0) {
+            if (doGetCaretPosition($input[0]) === 0 && self.options.isMaster) {
               var prev = $inputWrapper.prev();
               if (prev.length) {
                 self.remove(prev.data('item'));
@@ -385,7 +406,7 @@
 
           // DELETE
           case 46:
-            if (doGetCaretPosition($input[0]) === 0) {
+            if (doGetCaretPosition($input[0]) === 0 && self.options.isMaster) {
               var next = $inputWrapper.next();
               if (next.length) {
                 self.remove(next.data('item'));
@@ -394,7 +415,7 @@
             break;
 
           // LEFT ARROW
-          case 37:
+          case 39:
             // Try to move the input before the previous tag
             var $prevTag = $inputWrapper.prev();
             if ($input.val().length === 0 && $prevTag[0]) {
@@ -403,7 +424,7 @@
             }
             break;
           // RIGHT ARROW
-          case 39:
+          case 37:
             // Try to move the input after the next tag
             var $nextTag = $inputWrapper.next();
             if ($input.val().length === 0 && $nextTag[0]) {
@@ -432,10 +453,17 @@
 
          var text = $input.val(),
          maxLengthReached = self.options.maxChars && text.length >= self.options.maxChars;
-         if (self.options.freeInput && (keyCombinationInList(event, self.options.confirmKeys) || maxLengthReached)) {
+         
+         if ((self.options.freeInput || self.options.supermode) && (keyCombinationInList(event, self.options.confirmKeys) || maxLengthReached)) {
             // Only attempt to add a tag if there is data in the field
             if (text.length !== 0) {
-               self.add(maxLengthReached ? text.substr(0, self.options.maxChars) : text);
+                if (self.options.supermode) {
+                    // raise beforeItemAddSuperMode arg
+                    let getNewTidEvent = $.Event('beforeItemAddSuperMode', { item: text, self: self });
+                    self.$element.trigger(getNewTidEvent);
+                } else{
+                    self.add(maxLengthReached ? text.substr(0, self.options.maxChars) : text);
+                }
                $input.val('');
             }
 
@@ -444,7 +472,7 @@
                event.preventDefault();
             }
          }
-
+         
          // Reset internal input's size
          var textLength = $input.val().length,
             wordSpace = Math.ceil(textLength / 5),

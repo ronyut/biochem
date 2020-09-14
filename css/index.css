@@ -1,0 +1,126 @@
+body{
+    text-align:right;
+    padding: 90px 50px;
+}
+
+.page-wrapper{
+    direction: rtl;
+}
+
+nav {
+    direction: rtl;
+}
+
+article h1
+{
+    font-size:32px;
+    width: 100%;
+}
+
+article h2 {
+    font-size: 26px;
+}
+
+.correct
+{
+    color: green;
+}
+
+.incorrect
+{
+    color: grey;
+}
+
+.red
+{
+    color: red;
+    font-weight: bold;
+    
+}
+
+.tags-search-wrapper {
+    padding: 2rem 1rem;
+    background-color: #e9ecef;
+    border-radius: .3rem;
+}
+
+.tags-search {
+    width: 80%;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.tag-link{
+    margin-top:3px;
+    margin-right: 3px;
+}
+
+.not-really {
+    display:none;
+}
+
+.tags-inactive {
+    background: black;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.article-container[show=false]{
+    display:none;
+}
+
+.tag-active{
+    border: 4px solid black;
+}
+
+#cnt_visible{
+    font-weight: bold;
+}
+
+#cnt-visible-wrapper{
+    margin-top: 20px;
+}
+
+.myAlgo{
+    width: 80%;
+}
+
+.highlight{
+    background: yellow;
+}
+
+.scroll-to:hover{
+    color:#28a745;
+}
+
+.back-to-top {
+    position: fixed;
+    bottom: 25px;
+    left: 25px;
+    display: none;
+    z-index:100000;
+    border: 1px solid rgba(0, 0, 0, 0.27);
+}
+
+.dropdown-user {
+    text-align: right;
+}
+
+.dropdown-toggle::after {
+    display: block;
+}
+
+nav img {
+    border: none !important;
+    background: none !important;
+}
+
+.dropdown-results{
+    text-align: center;
+    width: 100%;
+}
+
+button[type="reset"]{
+    width: 90%;
+}

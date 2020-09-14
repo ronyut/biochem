@@ -1,36 +1,20 @@
-// add tag
-$('.tags-input').on('beforeItemAdd', function(event) {  
-    // dont post tags that are added automatically on page load
-    if(event.options && event.options.preventPost) {
-        return;
+function defaultSuccess(msg) {
+    if (msg.success) {
+        console.log(msg);
+    } else {
+        console.log("Error adding: " + msg);
+        alert("Error adding");
     }
-            
-    // all items: $(this).tagsinput('items')
-    $.ajax({
-        method: "POST",
-        url: "inc/ajax.php?action=addTag",
-        data: { tag: event.item.name, tid: event.item.tid, pid: $(this).attr("pid") },
-        dataType: 'json',
-        success: function (msg) {
-            if (msg.success) {
-                console.log(msg);
-            } else {
-                console.log("Error adding: " + msg);
-                alert("Error adding");
-            }
-        },
-        error: function(msg) {
-            alert("No response");
-        }
-    });
-});
+}
 
 // remove tag
 $('.tags-input').on('itemRemoved', function(event) {
+    let pid = $(this).attr("pid");
+
     $.ajax({
         method: "POST",
         url: "inc/ajax.php?action=removeTag",
-        data: { tag: event.item.name, pid: $(this).attr("pid") },
+        data: { tid: event.item.tid, pid: pid, text: event.item.name },
         dataType: 'json',
         success: function (msg) {
             if (msg.success) {
@@ -73,6 +57,7 @@ $(document).on("blur", "[contenteditable]", function(e){
         url: "inc/ajax.php?action=updatePhrase",
         data: { text: content,
                 pid: $(this).attr("pid"),
+                qid: $(this).closest(".article-container").attr("pid"),
                 hash: $(this).attr("hash"),
                 isComment: is_comment
               },
@@ -96,6 +81,7 @@ $(document).on("blur", "[contenteditable]", function(e){
 // Ctrl click to toggle (in)correct answer
 $(document).on('mousedown', '.answer', function (e) {
     let el = $(this);
+    let pid = $(this).attr("pid");
     if (e.ctrlKey  &&  e.button === 0) {
         e.stopPropagation ();
         e.preventDefault ()
@@ -103,7 +89,7 @@ $(document).on('mousedown', '.answer', function (e) {
         $.ajax({
             method: "POST",
             url: "inc/ajax.php?action=toggleAnswer",
-            data: { pid: $(this).attr("pid") },
+            data: { pid: pid, text: el.text(), qid: el.closest(".article-container").attr("pid") },
             dataType: 'json',
             success: function (msg) {
                 if (msg.success) {
@@ -134,7 +120,6 @@ $(document).on('mousedown', '.bootstrap-tagsinput .tag', function (e) {
         var filtered = items.filter(function(el) {
                                  return el.name === name;
                               });
-                              
         input.tagsinput('remove', filtered[0]);
     }
 });

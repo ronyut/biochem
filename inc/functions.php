@@ -1,6 +1,27 @@
 <?php
 	
-	
+    /**************************************************************
+		isSecureConn
+		check if https
+	**************************************************************/
+	function isSecureConn() {
+      return
+        (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || $_SERVER['SERVER_PORT'] == 443;
+    }
+    
+    /**************************************************************
+		getProtocol
+		return http or htts
+	**************************************************************/
+    function getProtocol(){
+        if(isSecureConn()) {
+            return "https";
+        }
+        return "http";
+    }
+    
+    
 	/**************************************************************
 		escape
 		escape illegal chars
@@ -45,6 +66,26 @@
             return false;
         } else {
             return true;
+        }
+    }
+    
+    /**************************************************************
+		textToBool:
+		Text to bool
+	**************************************************************/
+    function textToBool($text) {
+        return $text == "true";
+    }
+    
+    /**************************************************************
+		boolToInt:
+		bool to int
+	**************************************************************/
+    function boolToInt($bool) {
+        if($bool) {
+            return 1;
+        } else {
+            return 0;
         }
     }
     
@@ -153,11 +194,10 @@
         removeTag:
         Remove tag from question
 	**************************************************************/
-    function removeTag($tag, $pid) {
-        $tagID = tagNameToID($tag);
+    function removeTag($tagID, $pid, $text = "") {
         if($tagID != null) {
             $query = query("DELETE FROM tag2phrase WHERE tagID = $tagID AND pID = $pid");
-            
+            addHistory("Delete", "Tag", $pid, "Anonymous", $text, null);
             $query2 = query("SELECT * FROM tag2phrase WHERE tagID = $tagID");
             if(mysqli_num_rows($query2) == 0){
                 $query = query("DELETE FROM tags WHERE tagID = $tagID");
@@ -242,7 +282,7 @@
         getAllTags:
         Get an array of all tags
 	**************************************************************/
-    function getAllTags($orderBy = "cnt DESC") {
+    function getAllTags($orderBy = "cnt DESC", $where = "") {
         $query = query("SELECT tags.tagID, tags.tagName, count(tag2phrase.tagID) AS cnt FROM `tags`
                         JOIN tag2phrase ON tags.tagID = tag2phrase.tagID
                         GROUP BY tag2phrase.tagID
@@ -251,6 +291,21 @@
         $tags = array();
         while($row = mysqli_fetch_array($query)){
             $tags[$row["tagID"]] = array("name" => $row["tagName"], "count" => $row["cnt"], "color" => countToColor($row["cnt"]));
+        }
+        return $tags;
+    }
+    
+    /**************************************************************
+        getTagsByName:
+        Get an array of all tags
+	**************************************************************/
+    function getTagsByName($tagName) {
+        $query = query("SELECT * FROM tags
+                        WHERE tagName LIKE '$tagName%' OR tagName LIKE '% $tagName%'");
+        
+        $tags = array();
+        while($row = mysqli_fetch_array($query)){
+            array_push($tags, array("tid" => $row["tagID"], "name" => $row["tagName"]));
         }
         return $tags;
     }
@@ -270,16 +325,19 @@
     function getTagsDataForJS($id = null) {
         $query = getTagsByPid($id); // get all tags
         
-        $output = "<script>";
+        $data = array();
         while($row = mysqli_fetch_array($query)){
-            $pid = $row["pID"];
-            $tid = $row["tagID"];
+            $pid = (int) $row["pID"];
+            $tid = (int) $row["tagID"];
             $name = $row["tagName"];
-            $output .= "$('.tags-input[pid=".$pid."]').tagsinput('add',
-                         {'tid': ".$tid.", 'name': '".escape($name)."'}, {preventPost: true});\n";
+            $approved = intToBool($row["approved"]);
+            if(!array_key_exists($tid, $data)){
+                $data[$tid] = array("name" => $name, "approved" => $approved, "pids" => array($pid));
+            } else {
+                array_push($data[$tid]["pids"], $pid);
+            }
         }
-        $output .= "</script>";
-        return $output;
+        return $data;
     }
     
     /**************************************************************
@@ -292,7 +350,46 @@
             $clean = trimmer($word);
             array_push($newArr);
         }
-    return $newArr;
-}
+        return $newArr;
+    }
+    
+    function addHistory($actionType, $entityType, $qid = null, $user = "Anonymous", $content = "", $pid = null){      
+        if(!in_array($actionType, ACTION_TYPES) || !in_array($entityType, ENTITY_TYPES)) {
+            die("addHistory: Wrong action/entity type");
+        }
+        
+        $actionType = strtoupper($actionType[0]);
+        $entityType = strtoupper($entityType[0]);
+        
+        if($pid == null) {
+            $pid = "NULL";
+        }
+        
+        if($qid == null) {
+            $qid = "NULL";
+        }
+        
+        query("INSERT INTO history (actionType, entityType, user, content, pid, qid)
+               VALUES ('$actionType', '$entityType', '$user', '$content', $pid, $qid)");
+        
+        return;
+        if($entityType == "Phrase") {
+            switch($actionType){
+                case "Create":
+                    query("INSERT INTO history (actionType, entityType, user, newContent, relevantID)
+                           VALUES ()");
+                    break;
+                case "Modify":
+                    break;
+                case "Remove":
+                    break;
+                default:
+                    die("Unknown action type");
+                    break;
+            }
+        }
+        
+        
+    }
 
 ?>
