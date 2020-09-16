@@ -1,3 +1,104 @@
+let qid = $("body").attr("qid");
+let logged = $("body").attr("userID");
+showTalkBacks();
+
+let MAIN_TB_TEMPLATE = `<li class="media">
+                            <div class="talkback thread" threadID="{{THREAD_ID}}" tbid="{{ID}}" userID="{{USER_ID}}">
+                                <div class="pull-right">
+                                    <span class="media-count reviews hidden">{{INDEX}}</span>
+                                    <a>
+                                      <img class="media-object img-circle" src="{{IMAGE}}" alt="profile">
+                                    </a>
+                                </div>
+                                <div class="media-body">
+                                  <div class="well well-lg rtl">
+                                    <div class="row">
+                                        <div class="media-title col-xs-12">
+                                            <div class="media-date">{{DATE}}</div>
+                                            <h4 class="media-name reviews">{{NAME}}</h4>
+                                        </div>
+                                        <div class="col-xs-12">
+                                          <button type="button" class="vote likeButton">
+                                              {{LIKE_BUTTON}}
+                                              <span data-test="likeCount">0</span>
+                                          </button>
+                                          <button type="button" class="vote dislikeButton">
+                                              {{DISLIKE_BUTTON}}
+                                              <span data-test="dislikeCount">0</span>
+                                          </button>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <div class="media-talkback textarea" dir="auto">{{MESSAGE}}</div>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <a class="btn btn-info btn-circle reply-btn"><span class="glyphicon glyphicon-share-alt"></span> הגב</a>
+                                            <a class="btn btn-warning btn-circle" data-toggle="collapse" href="#replies_to_{{ID}}"><span class="glyphicon glyphicon-comment"></span> <span class="replies-counter">אין</span> תגובות</a>
+                                            <a class="btn btn-default btn-circle edit-btn hidden"><span class="glyphicon glyphicon-pencil"></span> <span class="text">ערוך</span></a>
+                                            <div class="toggleNewReply hidden">
+                                                <br>
+                                                <div contenteditable="true" dir='rtl' class='textarea temp-textarea-reply form-control'></div>
+                                                <br>
+                                                <a class="btn btn-success btn-circle reply-btn-send disabled"><span class="glyphicon glyphicon-send"></span> פרסמ/י תגובה</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                  </div>              
+                                </div>
+                                <div class="collapse in replies" id="replies_to_{{ID}}">
+                                    <ul class="media-list" id="replies"></ul>  
+                                </div>
+                            </div>
+                          </li>`;
+                          
+let REPLY_TEMPLATE = `<li class="media media-replied">
+                        <div class="talkback reply" tbid="{{ID}}" userID="{{USER_ID}}">
+                            <div class="pull-right media-head media-replied">
+                                <a href="#">
+                                  <img class="media-object img-circle" src="{{IMAGE}}" alt="profile">
+                                </a>
+                            </div>
+                            <div class="media-body">
+                              <div class="well well-lg rtl">
+                                  <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="media-title">
+                                            <div class="arrow-replyTo">
+                                                <span>{{REPLY_TO_NAME}}</span>
+                                                {{REPLY_TO_ARROW}}
+                                            </div>
+                                            <div class="media-date">{{DATE}}</div>
+                                            <h4 class="media-name reviews">{{NAME}}</h4>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12">
+                                      <button type="button" class="vote likeButton">
+                                            {{LIKE_BUTTON}}
+                                          <span data-test="likeCount">0</span>
+                                      </button>
+                                      <button type="button" class="vote dislikeButton">
+                                            {{DISLIKE_BUTTON}}
+                                          <span data-test="dislikeCount">0</span>
+                                      </button>
+                                    </div>
+                                    <div class="col-xs-12">
+                                        <div class="media-talkback textarea" dir="auto">{{MESSAGE}}</div>
+                                    </div>
+                                    <div class="col-xs-12">
+                                          <a class="btn btn-info btn-circle reply-btn"><span class="glyphicon glyphicon-share-alt"></span> הגב</a>
+                                          <a class="btn btn-default btn-circle edit-btn hidden"><span class="glyphicon glyphicon-pencil"></span> <span class="text">ערוך</span></a>
+                                          <div class="toggleNewReply hidden">
+                                              <br> 
+                                              <div contenteditable="true" dir='rtl' class='temp-textarea-reply textarea form-control'></div>
+                                              <br>
+                                              <a class="btn btn-success btn-circle reply-btn-send disabled"><span class="glyphicon glyphicon-send"></span> פרסמ/י תגובה</a>
+                                          </div>
+                                    </div>
+                                 </div>
+                              </div>              
+                            </div>
+                        </div>
+                    </li>`;
+
 $(document).on("click", "[role=tab]", function(e){
     let role = $(this).attr("data");
     if(role == "history") {
@@ -5,13 +106,9 @@ $(document).on("click", "[role=tab]", function(e){
     } else if (role == "talkbacks") {
         showTalkBacks();
     }
-    
-    
 });
 
 function showHistory() {
-    let qid = $("body").attr("qid");
-    
     $.get("inc/ajax.php?action=getHistory&qid=" + qid, function(data) {
         let i = 0;
         let output = ``;
@@ -73,24 +170,22 @@ function charToAction(c) {
 $("#talkbackForm").submit(function(e) {
     e.preventDefault();
 
-    let talkback = $(this).find("textarea").val();
+    let talkback = $(this).find("textarea").html();
     if(talkback != "") {
         addTalkback(talkback, null);
     }
 });
 
-$(document).on("change keyup", "#talkbackForm textarea", function(e) {
-    if($(this).val() == "") {
+$(document).on("change keyup", "#talkbackForm .textarea", function(e) {
+    if($(this).html() == "") {
         $("#talkbackForm button[type=submit]").addClass("disabled");
     } else {
-            console.log($(this).val());
        $("#talkbackForm button[type=submit]").removeClass("disabled"); 
     }
 });
 
 
 function addTalkback(talkback, replyTo) {
-    let qid = $("body").attr("qid");
     let data = {"qid": qid, "talkback": talkback};
     if(replyTo != null) {
         data["replyToTalkbackID"] = replyTo["talkbackID"];
@@ -114,14 +209,119 @@ function addTalkback(talkback, replyTo) {
     });
 }
 
-function showTalkBacks() {
-    let qid = $("body").attr("qid");
+function showTalkBacks(scrollTo = null) {
     $.get("inc/ajax.php?action=getTalkbacks&qid=" + qid, function(data) {
-        let i = 0;
-        let output = ``;
+        $("ul#threads").html("");
         $.each(data, function(key, value) {
+            let tbid = this.id;
+            let msg = this.msg;
+            let photo = this.photo;
+            let time = this.time;
+            let userID = this.userID;
+            let userFullName = this.userFullName;
+            let underTalkback = this.underTalkback;
+            let replyToUserName = this.replyToUserName;
             
-            i++;
+            let like = $("#templates #likeButton").get(0).outerHTML;
+            let dislike = $("#templates #dislikeButton").get(0).outerHTML;
+            let arrow = $("#templates #replyToArrow").get(0).outerHTML;
+            
+            let replacements = {"ID": tbid, "NAME": userFullName, "MESSAGE": msg, "DATE": time, "LIKE_BUTTON": like, "DISLIKE_BUTTON": dislike, "REPLY_TO_NAME": replyToUserName, "REPLY_TO_ARROW": arrow, "IMAGE": photo,
+            "USER_ID": userID};
+            
+            let template;
+            // main talkback
+            if (underTalkback == null) {
+                template = MAIN_TB_TEMPLATE;
+                replacements["THREAD_ID"] = tbid;
+            }
+            else {
+                template = REPLY_TEMPLATE;
+                replacements["THREAD_ID"] = underTalkback;
+            }
+            
+            $.each(replacements, function(key, value) {
+                let regex = new RegExp("\{\{" + key + "\}\}", "g");
+                template = template.replace(regex, value); 
+            });
+            
+            if (underTalkback == null) {
+                $("ul#threads").append(template);
+            } else {
+                $(".thread[tbid="+underTalkback+"] .replies ul").prepend(template);
+            }
+            
+            if(logged == userID) {
+                $(".talkback[tbid="+tbid+"] .edit-btn").removeClass("hidden");
+                $(".talkback[tbid="+tbid+"] .reply-btn").addClass("hidden");
+            }
         });
+        
+        var counter = data.reduce(function(obj, v) {
+          // increment or set the property
+          // `(obj[v.status] || 0)` returns the property value if defined
+          // or 0 ( since `undefined` is a falsy value
+          obj[v.underTalkback] = (obj[v.underTalkback] || 0) + 1;
+          return obj;
+        }, {});
+        
+        $.each(counter, function(key, value) {
+            if (key != null) {
+                $(".thread[tbid="+key+"] .replies-counter").text(value);
+            }
+        });
+        
+        if(scrollTo != null) {
+            $([document.documentElement, document.body]).animate({
+                scrollTop: $(".talkback[tbid="+scrollTo+"]").offset().top
+            }, 500);
+        }
+        
     });
 }
+
+$(document).on("click", ".reply-btn", function(e) {
+    $(this).parent().find(".toggleNewReply").toggleClass("hidden");
+});
+
+$(document).on("change keyup", ".toggleNewReply .temp-textarea-reply", function(e) {
+    let btn = $(this).parent().find(".reply-btn-send");
+    if($(this).html() == "") {
+        btn.addClass("disabled");
+    } else {
+       btn.removeClass("disabled");
+    }
+});
+
+$(document).on("click", ".reply-btn-send", function(e) {
+    let textarea = $(this).parent().find(".temp-textarea-reply");
+    let underUser = $(this).closest(".talkback").attr("userID");
+    let underTalkback = $(this).closest(".talkback[threadID]").attr("threadID");
+    
+    $.ajax({
+        method: "POST",
+        url: "inc/ajax.php?action=addTalkback",
+        data: { talkback: textarea.html(), qid: qid, replyToTalkbackID: underTalkback, replyToUserID: underUser },
+        dataType: 'json',
+        cache: false,
+        success: function (results) {
+            textarea.html("");
+            showTalkBacks(results.id);
+        },
+        error: function(msg) {
+            alert("Error fetching data from server");
+        }
+    });
+});
+
+$(document).on("click", ".edit-btn", function(e) {
+    let tb = $(this).parent().parent().find(".media-talkback");
+    console.log(tb);
+    if(tb.attr("contenteditable")) {
+        tb.removeAttr("contenteditable");
+        $(this).find("span.text").text("ערוך");
+    } else {
+        tb.attr("contenteditable", "true");
+        $(this).find("span.text").text("סיים עריכה");
+    }
+});

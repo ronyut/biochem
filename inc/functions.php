@@ -515,6 +515,10 @@
         getUserByID
 	**************************************************************/
     function getUserByID($userID) {
+        if ($userID == null) {
+            return false;
+        }
+        
         $hash = getValueFromDB("SELECT hash FROM users WHERE userID = '$userID'", "hash");
         if($hash === false) {
             return false;

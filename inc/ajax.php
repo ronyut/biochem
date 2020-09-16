@@ -198,7 +198,13 @@ switch($_GET['action']){
             break;
         }
         $qid = (int) $_POST['qid'];
-        $talkback = escape(htmlspecialchars($_POST["talkback"]));
+        
+        // HTML purifier
+        require_once 'html-purifier/HTMLPurifier.auto.php';
+        $config = HTMLPurifier_Config::createDefault();
+        $purifier = new HTMLPurifier($config);
+        $clean_html = $purifier->purify($_POST["talkback"]);
+        $talkback = trimmer(escape($clean_html));
         
         $replyToTalkbackID = "NUll";
         $replyToUserID = "NULL";
@@ -210,6 +216,7 @@ switch($_GET['action']){
         $sql = "INSERT INTO talkbacks (userID, msg, underTalkback, qID, replyToUser) 
                 VALUES ('".$USER["userID"]."', '$talkback', $replyToTalkbackID, $qid, $replyToUserID)";
         query($sql); 
+        $status["id"] = mysqli_insert_id($db);
         break;
     /*
         getTalkbacks
@@ -217,7 +224,7 @@ switch($_GET['action']){
     case "getTalkbacks":
     $json = array();
         $qid = (int) $_GET["qid"];
-        $query = query("SELECT * FROM talkbacks WHERE qID = $qid ORDER BY talkbackID DESC");
+        $query = query("SELECT * FROM talkbacks WHERE qID = $qid ORDER BY underTalkback, talkbackID DESC");
         while($row = mysqli_fetch_array($query)){
             $user = getUserByID($row["userID"]);
             $replyToUser = getUserByID($row["replyToUser"]);
@@ -227,9 +234,9 @@ switch($_GET['action']){
             $item = array("userID" => (int) $row["userID"],
                           "id" => (int) $row["talkbackID"],
                           "userFullName" => $fullName,
-                          "msg" => $row["msg"],
+                          "msg" => nl2br($row["msg"]),
                           "underTalkback" => $row["underTalkback"], // don't add (int) so it cal be null
-                          "time" => $row["time"],
+                          "time" => date("d/m/Y H:i", strtotime($row["time"])),
                           "photo" => $user["photo"],
                           "replyToUserName" => $replyToUserFullName,
                           "replyToUserID" => $row["replyToUser"] // don't add (int) so it cal be null
