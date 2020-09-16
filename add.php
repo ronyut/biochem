@@ -84,7 +84,6 @@ if(isset($_POST["add"])) {
     $foundAns = false;
     
     $i = 1;
-    $answerOf = "NULL";
     
     if (sizeof($phrases) <= 1) {
         pop("no question/answers!!");
@@ -137,13 +136,16 @@ if(isset($_POST["add"])) {
         $onlyPhrase = trimmer(escape($onlyPhrase));
         $comment = trimmer(escape($comment));
         
+        if ($i == 1) {
+            $addSql = "UPDATE phrases SET answerOf = pID WHERE answerOf IS NULL";
+        }
+        
         query("INSERT INTO phrases (phraseName, answerOf, isQuestion, isRight, comment)
-                VALUES ('$onlyPhrase', $answerOf, $isQuestion, $isAns, '$comment')");
+               VALUES ('$onlyPhrase', NULL, $isQuestion, $isAns, '$comment');
+               $addSql");
          
                
-        if ($i == 1) {
-            $answerOf = mysqli_insert_id($db);
-        }
+        $answerOf = mysqli_insert_id($db);
         $i++;
     }
 }

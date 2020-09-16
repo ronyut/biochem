@@ -6,10 +6,11 @@ require("inc/functions.php");
 $id = (int) $_GET['id'];
 $questionName = getValueFromDB("SELECT * FROM phrases WHERE pID = $id AND isQuestion = 1", "phraseName");
 if (!$questionName) {
-    header("Location: $PAGE_NOT_FOUND");
+    header("Location: ".PAGE_NOT_FOUND);
 }
 
-$isEditable = isset($_GET['editable']) && $_GET['editable'] == "true";
+$isEditable = (isset($_GET["editable"]) && $_GET["editable"] == "true") || (isset($USER) && $USER["isEditor"]);
+
 $editable = "false";
 if($isEditable){
     $editable = "true";
@@ -55,7 +56,6 @@ if($isEditable){
         background-color: #e9ecef;
         border-radius: .3rem;
         width:90%;
-        position: absolute;
     }
     footer h2 {
         display:inline;
@@ -72,6 +72,11 @@ if($isEditable){
     h2 {
         font-size:26px;
     }
+    
+    iframe{
+        border: 0;
+        margin-top: 50px;
+    }
     </style>
 
 </head>
@@ -87,6 +92,7 @@ if($isEditable){
     <footer class="tags-container">
         <input class="tags-input" pid="<?=$id?>" type="text" data-role="tagsinput">
         <br>
+        <div class="hidden">
         <?php
         $i = 1;
         foreach($tags as $tagID => $tagName) {
@@ -97,8 +103,9 @@ if($isEditable){
             $i++;
         }
         ?>
+        </div>
     </footer>
-    
+    <div class="iframe"></div>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
@@ -108,6 +115,7 @@ if($isEditable){
     <script src="js/main.js"></script>
     <script>
     pageLoaded("<?=$editable?>" == "true");
+    $(".iframe").html('<iframe src="comments.php?qid=' + <?=$id?> +'" width="90%" style="height:100%" border="0">');
     </script>
     <?php if($isEditable){ ?>
     <script src="js/editor.js"></script>

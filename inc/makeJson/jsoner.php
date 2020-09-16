@@ -59,10 +59,6 @@ while($row = mysqli_fetch_array($query)) {
     }
         
     $id = $row["answerOf"];
-    if($id == null) {
-        $id = $row["pID"];
-    }
-    
     if(!array_key_exists($id, $results)){
         $results[$id] = array();
     }

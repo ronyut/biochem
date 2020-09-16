@@ -142,11 +142,11 @@ function validate(tid) {
             
         }
         
-        if(LIMIT_TAGS){
+        /*if(LIMIT_TAGS){
             if (i > MAX_VISIBLE_TAGS && $(".tag-link:not(.tag-active):not(.hidden)").length > MAX_VISIBLE_TAGS) {
                 $(".tag-link[tid="+fil+"]").addClass("hidden");
             }
-        }
+        }*/
         
         i++;
     }
@@ -467,7 +467,10 @@ function putTagsInFilterArea(order) {
 }
 
 function loadAllQuestions(isEditable) {
-    let urlEditable = "&editable=" + isEditable;
+    let urlEditable = "";
+    if(isEditable == "true") {
+        urlEditable = "&editable=" + isEditable;
+    }
     
     $.get("inc/ajax.php?action=getAllQuestions" + urlEditable, function(data) {
         let i = 0;

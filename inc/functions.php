@@ -1,5 +1,13 @@
 <?php
-	
+
+    /**************************************************************
+		Global Vars
+	**************************************************************/
+	$USER = getLoggedUser();
+    $ROOT_PATH = getProtocol()."://$_SERVER[HTTP_HOST]";
+    $BASE_PATH = getProtocol()."://$_SERVER[HTTP_HOST]"."/biochem";
+    $ACTUAL_LINK = $ROOT_PATH.$_SERVER["REQUEST_URI"];
+
     /**************************************************************
 		isSecureConn
 		check if https
@@ -15,7 +23,7 @@
 		return http or htts
 	**************************************************************/
     function getProtocol(){
-        if(isSecureConn()) {
+        if(isSecureConn()){
             return "https";
         }
         return "http";
@@ -125,7 +133,7 @@
         }
         
         $i = 0;
-        $query = query("SELECT * FROM phrases WHERE pID = $id OR answerOf = $id ORDER BY pID ASC");
+        $query = query("SELECT * FROM phrases WHERE answerOf = $id ORDER BY pID ASC");
         while($row = mysqli_fetch_array($query)){
             // question
             if ($i == 0) {
@@ -234,7 +242,7 @@
     function removeTag($tagID, $pid, $text = "") {
         if($tagID != null) {
             $query = query("DELETE FROM tag2phrase WHERE tagID = $tagID AND pID = $pid");
-            addHistory("Delete", "Tag", $pid, "Anonymous", $text, null);
+            addHistory("Delete", "Tag", $text, array("qid" => $pid));
             $query2 = query("SELECT * FROM tag2phrase WHERE tagID = $tagID");
             if(mysqli_num_rows($query2) == 0){
                 $query = query("DELETE FROM tags WHERE tagID = $tagID");
@@ -312,7 +320,7 @@
                 return $row[$col];
             }                
         }
-        return null;
+        return false;
     }
     
     /**************************************************************
@@ -402,42 +410,154 @@
         return $newArr;
     }
     
-    function addHistory($actionType, $entityType, $qid = null, $user = "Anonymous", $content = "", $pid = null){      
+    /**************************************************************
+        addHistory:
+        addHistory
+	**************************************************************/
+    function addHistory($actionType, $entityType, $content = "", $ids = array()){      
+        global $USER;
+        
         if(!in_array($actionType, ACTION_TYPES) || !in_array($entityType, ENTITY_TYPES)) {
             die("addHistory: Wrong action/entity type");
+        }
+        
+        $userID = 0;
+        if($USER) {
+            $userID = $USER["userID"];
         }
         
         $actionType = strtoupper($actionType[0]);
         $entityType = strtoupper($entityType[0]);
         
-        if($pid == null) {
-            $pid = "NULL";
+        $pid = "NULL";
+        if(isset($ids["pid"])) {
+            $pid = $ids["pid"];
         }
         
-        if($qid == null) {
-            $qid = "NULL";
-        }
-        
-        query("INSERT INTO history (actionType, entityType, user, content, pid, qid)
-               VALUES ('$actionType', '$entityType', '$user', '$content', $pid, $qid)");
-        
-        return;
-        if($entityType == "Phrase") {
-            switch($actionType){
-                case "Create":
-                    query("INSERT INTO history (actionType, entityType, user, newContent, relevantID)
-                           VALUES ()");
-                    break;
-                case "Modify":
-                    break;
-                case "Remove":
-                    break;
-                default:
-                    die("Unknown action type");
-                    break;
+        $qid = "NULL";
+        if(isset($ids["qid"])) {
+            $qid = $ids["qid"];
+            if ($qid == $pid) {
+                $entityType = "Q";
             }
         }
         
+        
+        query("INSERT INTO history (actionType, entityType, userID, content, pid, qid)
+               VALUES ('$actionType', '$entityType', '$userID', '$content', $pid, $qid)");
+        
+        return;
+    }
+    
+    /**************************************************************
+        saveNewUser:
+        saveNewUser
+	**************************************************************/
+    function saveNewUser($data) {
+        global $db;
+        
+        if(!empty($data['email']))
+        {
+            $email = escape($data['email']);
+        } else {
+            return null;
+        }
+        
+        $firstName = escape($data['given_name']);
+        $lastName = escape($data['family_name']);
+        $photo = escape($data['picture']);
+        $hash = getHashWithSalt($email);
+        
+        if ($userID = isUserExists($email)) {
+            return getUserByID($userID)["hash"];
+        }
+        
+        query("INSERT INTO users (firstName, lastName, email, photo, hash)
+               VALUES ('$firstName', '$lastName', '$email', '$photo', '$hash')");
+        
+        return $hash;
+    }
+    
+    /**************************************************************
+        isUserExists:
+        isUserExists
+	**************************************************************/
+    function isUserExists($email) {
+        return getValueFromDB("SELECT userID FROM users WHERE email = '$email'", "userID");
+    }
+   
+    /**************************************************************
+        getUserByHash:
+        getUserByHash
+	**************************************************************/
+    function getUserByHash($hash) {
+        $hash = html_entity_decode($hash);
+        $output = array();
+        $query = query("SELECT * FROM users WHERE hash = '$hash'");
+        if(mysqli_num_rows($query) == 1) {
+            while($row = mysqli_fetch_array($query)){
+                $output["userID"] = (int) $row["userID"];
+                $output["firstName"] = $row["firstName"];
+                $output["lastName"] = $row["lastName"];
+                $output["email"] = $row["email"];
+                $output["photo"] = $row["photo"];
+                $output["isEditor"] = (int) $row["isEditor"];
+                $output["hash"] = $row["hash"];
+                $output["banned"] = $row["banned"];
+                return $output;
+            }                
+        }
+        return null;
+    }
+    
+    /**************************************************************
+        getUserByID:
+        getUserByID
+	**************************************************************/
+    function getUserByID($userID) {
+        $hash = getValueFromDB("SELECT hash FROM users WHERE userID = '$userID'", "hash");
+        if($hash === false) {
+            return false;
+        }
+        
+        return getUserByHash($hash);
+    }
+    
+    /**************************************************************
+        getHash:
+        getHash
+	**************************************************************/
+    function getHashWithSalt($email) {
+        $SALT = "$#W87hGFXC)_O&^RTFLKMGHVFDX$%SE09i;lm,GHV45esL:09iHYUJVG".time();
+        return password_hash($email.$salt, PASSWORD_ARGON2I);
+    }
+    
+    /**************************************************************
+        getLoggedUser:
+        getLoggedUser
+	**************************************************************/
+    function getLoggedUser($die = false) {
+        if (!isset($_COOKIE[COOKIE_HASH_NAME])) {
+            $user = getUserByID(0); // anonymous
+        } else {
+            $user = getUserByHash($_COOKIE[COOKIE_HASH_NAME]);
+        }
+        
+        if($user != null) {
+            return $user;
+        } else {
+            return false;
+        }
+    }
+    
+    function makeFullName($user) {
+        $fullname = $user["firstName"];
+        if (!empty($user["firstName"]) && !empty($user["lastName"])) {
+            $fullname .= " ".$user["lastName"];
+        } else if (empty($user["firstName"])) {
+            $fullname = $user["email"];
+        }
+        return $fullname;
         
     }
 

@@ -6,8 +6,9 @@
     
     const DB_NAME = "biochem";
     const PAGE_NOT_FOUND = "404.php";
+    const COOKIE_HASH_NAME = "biochem_user_hash";
     const ACTION_TYPES = ["Add", "Edit", "Delete"];
-    const ENTITY_TYPES = ["Answer", "Tag", "Phrase", "User"];
+    const ENTITY_TYPES = ["Answer", "Tag", "Phrase", "User", "Qusetion"];
     $SERVER_NAME = $_SERVER['SERVER_NAME'];
     
     const HOST_MAP = array(
