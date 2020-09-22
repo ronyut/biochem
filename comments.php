@@ -103,14 +103,14 @@ $qid = (int) $_GET['qid'];
          display:inline;
     }
     
-    .talkback button {
+    .talkback button.vote {
         background-color: transparent;
         border: 0;
         font-size: 28px;
         color: #0B7EB5;
     }
     
-    .talkback button span {
+    .talkback button.vote span {
         font-size: 14px;
         color: #787878;
         font-weight:bold;
@@ -127,8 +127,8 @@ $qid = (int) $_GET['qid'];
         
     }
     
-    button.vote:focus{
-        outline: none;
+    button:focus{
+        outline: none !important;
     }
     
     button.vote:hover{
@@ -163,7 +163,10 @@ $qid = (int) $_GET['qid'];
     
     #talkbackForm .textarea{
         border: 1px solid #c7c7c7;
-        text-align: right;
+    }
+    
+    .textarea {
+        text-align: start;
     }
     
     </style>

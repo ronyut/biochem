@@ -31,14 +31,14 @@ let MAIN_TB_TEMPLATE = `<li class="media">
                                             <div class="media-talkback textarea" dir="auto">{{MESSAGE}}</div>
                                         </div>
                                         <div class="col-xs-12">
-                                            <a class="btn btn-info btn-circle reply-btn"><span class="glyphicon glyphicon-share-alt"></span> הגב</a>
-                                            <a class="btn btn-warning btn-circle" data-toggle="collapse" href="#replies_to_{{ID}}"><span class="glyphicon glyphicon-comment"></span> <span class="replies-counter">אין</span> תגובות</a>
-                                            <a class="btn btn-default btn-circle edit-btn hidden"><span class="glyphicon glyphicon-pencil"></span> <span class="text">ערוך</span></a>
+                                            <button class="btn btn-info btn-circle reply-btn"><span class="glyphicon glyphicon-share-alt"></span> הגב</button>
+                                            <button class="btn btn-warning btn-circle" data-toggle="collapse" href="#replies_to_{{ID}}"><span class="glyphicon glyphicon-comment"></span> <span class="replies-counter">אין</span> תגובות</button>
+                                            <button class="btn btn-default btn-circle edit-btn hidden"><span class="glyphicon glyphicon-pencil"></span> <span class="text">ערוך</span></button>
                                             <div class="toggleNewReply hidden">
                                                 <br>
                                                 <div contenteditable="true" dir='rtl' class='textarea temp-textarea-reply form-control'></div>
                                                 <br>
-                                                <a class="btn btn-success btn-circle reply-btn-send disabled"><span class="glyphicon glyphicon-send"></span> פרסמ/י תגובה</a>
+                                                <button class="btn btn-success btn-circle reply-btn-send disabled"><span class="glyphicon glyphicon-send"></span> פרסמ/י תגובה</button>
                                             </div>
                                         </div>
                                     </div>
@@ -84,13 +84,13 @@ let REPLY_TEMPLATE = `<li class="media media-replied">
                                         <div class="media-talkback textarea" dir="auto">{{MESSAGE}}</div>
                                     </div>
                                     <div class="col-xs-12">
-                                          <a class="btn btn-info btn-circle reply-btn"><span class="glyphicon glyphicon-share-alt"></span> הגב</a>
-                                          <a class="btn btn-default btn-circle edit-btn hidden"><span class="glyphicon glyphicon-pencil"></span> <span class="text">ערוך</span></a>
+                                          <button class="btn btn-info btn-circle reply-btn"><span class="glyphicon glyphicon-share-alt"></span> הגב</button>
+                                          <button class="btn btn-default btn-circle edit-btn hidden"><span class="glyphicon glyphicon-pencil"></span> <span class="text">ערוך</span></button>
                                           <div class="toggleNewReply hidden">
                                               <br> 
                                               <div contenteditable="true" dir='rtl' class='temp-textarea-reply textarea form-control'></div>
                                               <br>
-                                              <a class="btn btn-success btn-circle reply-btn-send disabled"><span class="glyphicon glyphicon-send"></span> פרסמ/י תגובה</a>
+                                              <button class="btn btn-success btn-circle reply-btn-send disabled"><span class="glyphicon glyphicon-send"></span> פרסמ/י תגובה</button>
                                           </div>
                                     </div>
                                  </div>
@@ -170,9 +170,12 @@ function charToAction(c) {
 $("#talkbackForm").submit(function(e) {
     e.preventDefault();
 
-    let talkback = $(this).find("textarea").html();
+    let talkback = $(this).find(".textarea").html();
     if(talkback != "") {
-        addTalkback(talkback, null);
+        addTalkback(talkback, null, function(){
+            $("#talkbackForm textarea").val("");
+            $("#talkbackForm textarea").trigger("change");
+        });
     }
 });
 
@@ -185,7 +188,7 @@ $(document).on("change keyup", "#talkbackForm .textarea", function(e) {
 });
 
 
-function addTalkback(talkback, replyTo) {
+function addTalkback(talkback, replyTo, callback) {
     let data = {"qid": qid, "talkback": talkback};
     if(replyTo != null) {
         data["replyToTalkbackID"] = replyTo["talkbackID"];
@@ -198,10 +201,9 @@ function addTalkback(talkback, replyTo) {
         data: data,
         dataType: 'json',
         cache: false,
-        success: function (results) {
-            $("#talkbackForm textarea").val("");
-            $("#talkbackForm textarea").trigger("change");
-            $("a[data=talkbacks]").click();
+        success: function(data) {
+            callback();
+            repliesDataToHtml();
         },
         error: function(msg) {
             alert("Error fetching data from server");
@@ -212,50 +214,7 @@ function addTalkback(talkback, replyTo) {
 function showTalkBacks(scrollTo = null) {
     $.get("inc/ajax.php?action=getTalkbacks&qid=" + qid, function(data) {
         $("ul#threads").html("");
-        $.each(data, function(key, value) {
-            let tbid = this.id;
-            let msg = this.msg;
-            let photo = this.photo;
-            let time = this.time;
-            let userID = this.userID;
-            let userFullName = this.userFullName;
-            let underTalkback = this.underTalkback;
-            let replyToUserName = this.replyToUserName;
-            
-            let like = $("#templates #likeButton").get(0).outerHTML;
-            let dislike = $("#templates #dislikeButton").get(0).outerHTML;
-            let arrow = $("#templates #replyToArrow").get(0).outerHTML;
-            
-            let replacements = {"ID": tbid, "NAME": userFullName, "MESSAGE": msg, "DATE": time, "LIKE_BUTTON": like, "DISLIKE_BUTTON": dislike, "REPLY_TO_NAME": replyToUserName, "REPLY_TO_ARROW": arrow, "IMAGE": photo,
-            "USER_ID": userID};
-            
-            let template;
-            // main talkback
-            if (underTalkback == null) {
-                template = MAIN_TB_TEMPLATE;
-                replacements["THREAD_ID"] = tbid;
-            }
-            else {
-                template = REPLY_TEMPLATE;
-                replacements["THREAD_ID"] = underTalkback;
-            }
-            
-            $.each(replacements, function(key, value) {
-                let regex = new RegExp("\{\{" + key + "\}\}", "g");
-                template = template.replace(regex, value); 
-            });
-            
-            if (underTalkback == null) {
-                $("ul#threads").append(template);
-            } else {
-                $(".thread[tbid="+underTalkback+"] .replies ul").prepend(template);
-            }
-            
-            if(logged == userID) {
-                $(".talkback[tbid="+tbid+"] .edit-btn").removeClass("hidden");
-                $(".talkback[tbid="+tbid+"] .reply-btn").addClass("hidden");
-            }
-        });
+        repliesDataToHtml(data, scrollTo);
         
         var counter = data.reduce(function(obj, v) {
           // increment or set the property
@@ -270,20 +229,73 @@ function showTalkBacks(scrollTo = null) {
                 $(".thread[tbid="+key+"] .replies-counter").text(value);
             }
         });
-        
-        if(scrollTo != null) {
-            $([document.documentElement, document.body]).animate({
-                scrollTop: $(".talkback[tbid="+scrollTo+"]").offset().top
-            }, 500);
-        }
-        
     });
 }
 
+function repliesDataToHtml(data, scrollTo){
+    $.each(data, function(key, value) {
+        let tbid = this.id;
+        let msg = this.msg;
+        let photo = this.photo;
+        let time = this.time;
+        let userID = this.userID;
+        let userFullName = this.userFullName;
+        let underTalkback = this.underTalkback;
+        let replyToUserName = this.replyToUserName;
+        
+        let like = $("#templates #likeButton").get(0).outerHTML;
+        let dislike = $("#templates #dislikeButton").get(0).outerHTML;
+        let arrow = $("#templates #replyToArrow").get(0).outerHTML;
+        
+        let replacements = {"ID": tbid, "NAME": userFullName, "MESSAGE": msg, "DATE": time, "LIKE_BUTTON": like, "DISLIKE_BUTTON": dislike, "REPLY_TO_NAME": replyToUserName, "REPLY_TO_ARROW": arrow, "IMAGE": photo,
+        "USER_ID": userID};
+        
+        let template;
+        // main talkback
+        if (underTalkback == null) {
+            template = MAIN_TB_TEMPLATE;
+            replacements["THREAD_ID"] = tbid;
+        }
+        else {
+            template = REPLY_TEMPLATE;
+            replacements["THREAD_ID"] = underTalkback;
+        }
+        
+        $.each(replacements, function(key, value) {
+            let regex = new RegExp("\{\{" + key + "\}\}", "g");
+            template = template.replace(regex, value); 
+        });
+        
+        if (underTalkback == null) {
+            $("ul#threads").append(template);
+        } else {
+            $(".thread[tbid="+underTalkback+"] .replies ul").prepend(template);
+        }
+        
+        if(logged == userID) {
+            $(".talkback[tbid="+tbid+"] .edit-btn").removeClass("hidden");
+            $(".talkback[tbid="+tbid+"] .reply-btn").addClass("hidden");
+        }
+    });
+    
+    // scroll to new talkback
+     if(scrollTo != null) {
+        $([document.documentElement, document.body]).animate({
+            scrollTop: $(".talkback[tbid="+scrollTo+"]").offset().top
+        }, 500);
+    }
+}
+
+/*
+    Show textarea of sub talkback once clicked on the button
+*/
 $(document).on("click", ".reply-btn", function(e) {
     $(this).parent().find(".toggleNewReply").toggleClass("hidden");
 });
 
+/*
+    Disable send button if talkback textarea is empty
+*/
 $(document).on("change keyup", ".toggleNewReply .temp-textarea-reply", function(e) {
     let btn = $(this).parent().find(".reply-btn-send");
     if($(this).html() == "") {
@@ -293,35 +305,55 @@ $(document).on("change keyup", ".toggleNewReply .temp-textarea-reply", function(
     }
 });
 
+/*
+    Add new sub talkback
+*/
 $(document).on("click", ".reply-btn-send", function(e) {
+    let replyTo = {};
+    replyTo["talkbackID"] = $(this).closest(".talkback[threadID]").attr("threadID");
+    replyTo["userID"] = $(this).closest(".talkback").attr("userID");
     let textarea = $(this).parent().find(".temp-textarea-reply");
-    let underUser = $(this).closest(".talkback").attr("userID");
-    let underTalkback = $(this).closest(".talkback[threadID]").attr("threadID");
     
-    $.ajax({
-        method: "POST",
-        url: "inc/ajax.php?action=addTalkback",
-        data: { talkback: textarea.html(), qid: qid, replyToTalkbackID: underTalkback, replyToUserID: underUser },
-        dataType: 'json',
-        cache: false,
-        success: function (results) {
-            textarea.html("");
-            showTalkBacks(results.id);
-        },
-        error: function(msg) {
-            alert("Error fetching data from server");
-        }
+    addTalkback(textarea.html(), replyTo, function() {
+        textarea.html("");
     });
 });
 
+/*
+    Edit talkback
+*/
 $(document).on("click", ".edit-btn", function(e) {
     let tb = $(this).parent().parent().find(".media-talkback");
-    console.log(tb);
+    let tbid = $(this).closest(".talkback[tbid]").attr("tbid");
+
     if(tb.attr("contenteditable")) {
         tb.removeAttr("contenteditable");
         $(this).find("span.text").text("ערוך");
+        updateTalkback(tb, tbid);
     } else {
         tb.attr("contenteditable", "true");
         $(this).find("span.text").text("סיים עריכה");
     }
 });
+
+/*
+    Edit talkback - ajax
+*/
+function updateTalkback(tb, tbid) {
+    $.ajax({
+        method: "POST",
+        url: "inc/ajax.php?action=updateTalkback",
+        data: { talkback: $(tb).html(), tbid: tbid },
+        dataType: 'json',
+        cache: false,
+        success: function (data) {
+            if (!data.success) {
+                alert("Error");
+                console.log(data);
+            }
+        },
+        error: function(msg) {
+            alert("Error fetching data from server");
+        }
+    });
+}

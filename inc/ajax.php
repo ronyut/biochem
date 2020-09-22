@@ -78,10 +78,7 @@ switch($_GET['action']){
         }
         
         // HTML purifier
-        require_once 'html-purifier/HTMLPurifier.auto.php';
-        $config = HTMLPurifier_Config::createDefault();
-        $purifier = new HTMLPurifier($config);
-        $clean_html = $purifier->purify($_POST["text"]);
+        $clean_html = purifyHtml($_POST["text"]);
         $status["clean"] = $clean_html;
         
         $column = "phraseName";
@@ -175,7 +172,7 @@ switch($_GET['action']){
         getHistory
     */    
     case "getHistory":
-    $json = array();
+        $json = array();
         $qid = (int) $_GET["qid"];
         $query = query("SELECT * FROM history WHERE qid = $qid ORDER BY hID DESC");
         while($row = mysqli_fetch_array($query)){
@@ -200,13 +197,10 @@ switch($_GET['action']){
         $qid = (int) $_POST['qid'];
         
         // HTML purifier
-        require_once 'html-purifier/HTMLPurifier.auto.php';
-        $config = HTMLPurifier_Config::createDefault();
-        $purifier = new HTMLPurifier($config);
-        $clean_html = $purifier->purify($_POST["talkback"]);
+        $clean_html = purifyHtml($_POST["talkback"]);
         $talkback = trimmer(escape($clean_html));
         
-        $replyToTalkbackID = "NUll";
+        $replyToTalkbackID = "NULL";
         $replyToUserID = "NULL";
         if (isset($_POST['replyToTalkbackID']) && isset($_POST['replyToUserID'])) {
             $replyToTalkbackID = (int) $_POST['replyToTalkbackID'];
@@ -218,11 +212,30 @@ switch($_GET['action']){
         query($sql); 
         $status["id"] = mysqli_insert_id($db);
         break;
+    
+    /*
+        updateTalkback
+    */ 
+    case "updateTalkback":
+        if(!isset($_POST["talkback"]) || !isset($_POST["tbid"])) {
+            $status["success"] = false;
+            break;
+        }
+        $tbid = (int) $_POST['tbid'];
+        $talkback = purifyHtml($_POST["talkback"]);
+        
+        $sql = "UPDATE talkbacks SET msg = '$talkback' WHERE userID = ".$USER["userID"]." AND talkbackID = $tbid";
+        query($sql); 
+        
+        $status["clean"] = $talkback;
+        
+        break;
+    
     /*
         getTalkbacks
     */    
     case "getTalkbacks":
-    $json = array();
+        $json = array();
         $qid = (int) $_GET["qid"];
         $query = query("SELECT * FROM talkbacks WHERE qID = $qid ORDER BY underTalkback, talkbackID DESC");
         while($row = mysqli_fetch_array($query)){
@@ -245,7 +258,11 @@ switch($_GET['action']){
         }
         echo json_encode($json, JSON_UNESCAPED_UNICODE);
         exit;
-        break;    
+        break;
+    case "savePhoto":
+        savePhoto($USER["photo"], $USER["userID"]);
+        $status["photo"] = $USER["photo"];
+        break;
     default:
         break;
 }

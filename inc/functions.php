@@ -475,6 +475,8 @@
         query("INSERT INTO users (firstName, lastName, email, photo, hash)
                VALUES ('$firstName', '$lastName', '$email', '$photo', '$hash')");
         
+        savePhoto($photo, mysqli_insert_id($db));
+        
         return $hash;
     }
     
@@ -563,6 +565,49 @@
         }
         return $fullname;
         
+    }
+    
+    function purifyHtml($input) {
+        require_once 'html-purifier/HTMLPurifier.auto.php';
+        $config = HTMLPurifier_Config::createDefault();
+        $config->set('AutoFormat.RemoveEmpty', true); // remove empty elements
+        $config->set('AutoFormat.RemoveSpansWithoutAttributes', true); // remove empty spans
+        //$config->set('CSS.Trusted', true); // trust user
+        $config->set('CSS.Proprietary', true); // allow safe, proprietary CSS values.
+        $config->set('CSS.AllowedProperties', array('color', 'direction', 'vertical-align', 'border', 'background',
+                                                    'background-color', 'font-weight', 'text-decoration', 'font-size', 'background-image', 'width', 'height', 'margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'padding', 'border-color', 'border-width', 'border-style', 'border-radius', 'font', 'font-family', 'font-style', 'text-align')); // remove all CSS
+        $config->set('HTML.AllowedElements', array('p', 'div', 'a', 'br', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'ul',                                           'ol', 'li', 'b', 'i', 'span', 'img', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                                                   'hr', 'dl', 'dt', 'dd', 'del', 'video', 'audio'));
+        //$config->set('HTML.AllowedAttributes', array('a.href', 'img.src')); // remove all attributes except a.href
+        $purifier = new HTMLPurifier($config);
+        $clean_html = $purifier->purify($input);
+        $talkback = trimmer(escape($clean_html));
+        return $talkback;
+    }
+    
+    /*
+        savePhoto:
+        Save user google photo on server
+    */
+    function savePhoto($url, $userID) {
+        $file = fopen('../img/users/profiles/'.$userID.'.jpg', 'w');
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, [
+            CURLOPT_URL            => $url,
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_FOLLOWLOCATION => 1,
+            CURLOPT_FILE           => $file,
+            CURLOPT_TIMEOUT        => 5,
+            //CURLOPT_COOKIEJAR      => 'cookie.txt',
+            CURLOPT_SSL_VERIFYPEER => 0
+        ]);
+
+        $response = curl_exec($curl);
+        if ($response !== false) {
+            //query("UPDATE users SET photo = '' WHERE userID = '$userID'");
+        }
     }
 
 ?>
