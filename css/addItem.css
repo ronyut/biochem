@@ -1,0 +1,27 @@
+body{
+    padding: 3%;
+    text-align:right;
+}
+
+.red
+{
+    color: red;
+    font-weight: bold;
+}
+
+.remove {
+    margin-right:10px;
+    cursor:pointer;
+}
+
+.label-correct {
+    margin-right: 15px;
+}
+
+.answer-wrapper {
+    margin-top:10px;
+}
+
+h1 {
+    margin-top: 50px;
+}

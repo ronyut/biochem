@@ -1,7 +1,9 @@
 <?php
 
-$isIndex = true;
+$is_index = true;
 $styleCSS = "index.css";
+$showBackToTopButton = true;
+$showSearchForm = true;
 
 require("inc/config.php");
 require("inc/functions.php");

@@ -17,12 +17,12 @@ $qid = (int) $_GET['qid'];
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="img/favicon.png">
-    <link href="http://netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 
     <title>תגובות</title>
     
     <style>
-    @import url(http://fonts.googleapis.com/earlyaccess/opensanshebrew.css);
+    @import url(https://fonts.googleapis.com/earlyaccess/opensanshebrew.css);
 
     *, :after, :before {
         direction: rtl;
@@ -172,6 +172,7 @@ $qid = (int) $_GET['qid'];
     </style>
 </head>
 <body qid="<?=$qid?>" userID="<?=$USER["userID"]?>">
+
 <div align="center" class="page-wrapper">
     <div class="talkback-tabs">
         <ul class="nav nav-tabs" role="tablist">
@@ -180,7 +181,7 @@ $qid = (int) $_GET['qid'];
                     <h4 class="reviews text-capitalize">כל התגובות</h4>
                 </a>
             </li>
-            <li>
+            <li class="hidden">
                 <a href="#add-talkback" role="tab" data-toggle="tab">
                     <h4 class="reviews text-capitalize">תגובה חדשה</h4>
                 </a>
@@ -193,7 +194,26 @@ $qid = (int) $_GET['qid'];
         </ul>            
         <div class="tab-content">
             <div class="tab-pane active" id="talkbacks"> 
-                <ul class="media-list" id="threads"></ul> 
+                <!--<ul class="media-list" id="threads"></ul>-->
+                <div id="disqus_thread"></div>
+                <script>
+                    /**
+                    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+                    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+                    
+                    var disqus_config = function () {
+                    this.page.url = "<?=$BASE_URL."comments.php?qid=".$qid?>";  // Replace PAGE_URL with your page's canonical URL variable
+                    this.page.identifier = "<?=md5("comments-qid-".$qid)?>"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+                    };
+                    
+                    (function() { // DON'T EDIT BELOW THIS LINE
+                    var d = document, s = d.createElement('script');
+                    s.src = 'https://biochem-1.disqus.com/embed.js';
+                    s.setAttribute('data-timestamp', +new Date());
+                    (d.head || d.body).appendChild(s);
+                    })();
+                </script>
+                <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
             </div>
             <div class="tab-pane" id="add-talkback">
                 <form id="talkbackForm">
@@ -220,7 +240,7 @@ $qid = (int) $_GET['qid'];
                 </thead>
                 <tbody id="history_tbody">
                     <tr>
-                        <td colspan="4">עם שאינו יודע את עברו, ההווה שלו דל ועתידו לוט בערפל</td>
+                        <td colspan="4">פול גז בניוטרל?</td>
                     </tr>
                 </tbody>
                 </table>
@@ -244,7 +264,9 @@ $qid = (int) $_GET['qid'];
 </div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script src="http://netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script src="https://netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 <script src="js/talkback.js"></script>
+<script id="dsq-count-scr" src="//biochem-1.disqus.com/count.js" async></script>
+
 </body>
 </html>

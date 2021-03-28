@@ -8,9 +8,10 @@
     const PAGE_NOT_FOUND = "404.php";
     const COOKIE_HASH_NAME = "biochem_user_hash";
     const ACTION_TYPES = ["Add", "Edit", "Delete"];
-    const ENTITY_TYPES = ["Answer", "Tag", "Phrase", "User", "Qusetion"];
+    const ENTITY_TYPES = ["Answer", "Tag", "Phrase", "User", "Question"];
     $SERVER_NAME = $_SERVER['SERVER_NAME'];
-    
+    $BASE_URL = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/'.DB_NAME.'/';
+
     const HOST_MAP = array(
             "rony1" => "3451754",
             "rony3" => "3451771",

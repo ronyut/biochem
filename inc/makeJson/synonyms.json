@@ -960,7 +960,10 @@
 	},
 	{
 		"term": "שאטל",
-		"variants": "נדנד"
+		"variants": [
+			"נדנד",
+			"shuttle"
+		]
 	},
 	{
 		"term": "שומן",

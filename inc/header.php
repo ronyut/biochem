@@ -82,6 +82,13 @@ if(!isset($is_index)) {
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css">
     <?=$styleCSS?>
 
+    <style>
+    .dropdown-menu {
+        text-align: right;
+        margin: .125rem -80 0;
+    }
+    </style>
+
     <title><?=$pageTitle?></title>
 
 </head>
@@ -89,20 +96,20 @@ if(!isset($is_index)) {
 <body>
     <!-- navbar -->
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-      <a class="navbar-brand" href="#">ביוכימיה <img src="img/favicon.png" border="0" width="40" height="40"></a>
+      <a class="navbar-brand" href="<?=$BASE_URL?>">ביוכימיה <img src="img/favicon.png" border="0" width="40" height="40"></a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav">
           <li class="nav-item active">
-            <a class="nav-link" href="#">שחזורים</a>
+            <a class="nav-link" href="<?=$BASE_URL?>">שחזורים</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">שינויים אחרונים <i class="fas fa-history"></i></a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">הוספת שאלה +</a>
+            <a class="nav-link" href="addItem.php">הוספת שאלה +</a>
           </li>
         </ul>
         <div class="navbar-nav" style="margin-right: auto;">
@@ -126,9 +133,15 @@ if(!isset($is_index)) {
                     <?php } ?>
                 </div>
               </div>
-              
+
+            <?php
+            if (!isset($showSearchForm)) {
+                $showSearchForm = false;
+            }
+
+            if ($showSearchForm) { ?>
             <form id="myAlgoForm" class="form-inline mt-2 dropdown <?=$is_index?>">
-                <input class="myAlgo form-control mr-sm-2" type="text" id="myAlgo" placeholder="שאל אותי שאלה" aria-label="Search" autocomplete="off">
+                <input class="myAlgo form-control mr-sm-2" type="text" id="myAlgo" placeholder="חיפוש בזק" aria-label="Search" autocomplete="off">
                 <button class="btn btn-outline-success my-2 my-sm-0" style="margin-right: 10px !important;" type="submit">
                     <i class="fas fa-search"></i>
                 </button>
@@ -138,11 +151,19 @@ if(!isset($is_index)) {
                     <button type="reset" onclick="clearMyAlgoResults()" class="btn btn-default">נקה חיפוש</button>
                 </div>
             </form>
+            <?php } ?>
         </div>
       </div>
     </nav>
     
     <!-- scroll to top -->
+    <?php
+    if (!isset($showBackToTopButton)) {
+        $showBackToTopButton = false;
+    }
+
+    if ($showBackToTopButton) { ?>
     <a href="#" class="btn btn-light btn-lg back-to-top" role="button">
         <i class="fas fa-chevron-up"></i>
     </a>
+    <?php } ?>
