@@ -70,6 +70,5 @@ require("inc/header.php");
     <?php if($isEditable){ ?>
     <script src="js/editor.js"></script>
     <?php } ?>
-
 </body>
 </html>

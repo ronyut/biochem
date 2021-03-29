@@ -108,8 +108,13 @@ $(document).on("click", "[role=tab]", function(e){
     }
 });
 
-function showHistory() {
-    $.get("inc/ajax.php?action=getHistory&qid=" + qid, function(data) {
+function showHistory(getAll = false) {
+    let params = "getHistory&qid=" + qid;
+    if (getAll) {
+        params = "getAllHistory";
+    }
+
+    $.get("inc/ajax.php?action=" + params, function(data) {
         let i = 0;
         let output = ``;
         $.each(data, function(key, value) {
@@ -120,10 +125,18 @@ function showHistory() {
             let content = this.content;
             let pid = this.pid;
             let time = this.time;
+            if (getAll) {
+                qid = this.qid;
+            }
             
             let action = charToAction(actionKey);
             
             output += `<tr><th scope="row">` + (data.length - (i)) + `</th>`;
+
+            if (getAll) {
+                output += `<td><a target="_blank" href="item.php?id=`+ qid + `">` + qid + `</a></td>`;
+            }
+
             output += `<td>` + time + `</td>`;
             output += "<td>" + fullName + " ";
             

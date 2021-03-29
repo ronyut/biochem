@@ -22,7 +22,7 @@ if(isset($_GET['heat'])){
             <div class="tags-search">
                 <img src="img/flask.gif" width="150" height="150" border="0">
             </div>
-            <div id="cnt-visible-wrapper"><span id="cnt_visible">טוען</span> תוצאות</div><br>
+            <div id="cnt-visible-wrapper"><span id="cnt_visible">טוען</span> שאלות</div><br>
         </div>
         <div id="articles"></div>
     </div>

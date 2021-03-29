@@ -190,12 +190,13 @@
 		"term": "PEP",
 		"variants": [
 			"פוספו-אנול-פירווט",
-			"פוספואנולפירווט"
+			"פוספואנולפירווט",
+			"Phosphoenolpyruvate"
 		]
 	},
 	{
 		"term": "PEPCK",
-		"variants": "פוספואנול-פירווט קרבוקסיקינאז"
+		"variants": "פוספואנול פירווט קרבוקסיקינאז"
 	},
 	{
 		"term": "PFK",
@@ -914,7 +915,10 @@
 	},
 	{
 		"term": "קרבוקסיקינאז",
-		"variants": "carboxykinase"
+		"variants": [
+			"carboxykinase",
+			"CK"
+		]
 	},
 	{
 		"term": "קרבס",
@@ -1010,5 +1014,210 @@
 	{
 		"term": "תצמיד",
 		"variants": "צימוד"
+	},
+	{
+		"term": "בופר",
+		"variants": [
+			"buffer",
+			"באפר"
+		]
+	},
+	{
+		"term": "Alanine",
+		"variants": [
+			"Ala",
+			"A",
+			"אלאנין",
+			"אלנין"
+		]
+	},
+	{
+		"term": "Arginine",
+		"variants": [
+			"Arg",
+			"R",
+			"ארגינין",
+			"ארגנין"
+		]
+	},
+	{
+		"term": "Asparagine",
+		"variants": [
+			"Asn",
+			"N",
+			"אספרגין"
+		]
+	},
+	{
+		"term": "Aspartate",
+		"variants": [
+			"Asp",
+			"D",
+			"אספרטט",
+			"אספרטאט"
+		]
+	},
+	{
+		"term": "Cysteine",
+		"variants": [
+			"Cys",
+			"C",
+			"ציסטאין",
+			"ציסטין"
+		]
+	},
+	{
+		"term": "Glutamine",
+		"variants": [
+			"Gln",
+			"Q",
+			"גלוטמין"
+		]
+	},
+	{
+		"term": "Glycine",
+		"variants": [
+			"Gly",
+			"G",
+			"גליצין"
+		]
+	},
+	{
+		"term": "Glutamate",
+		"variants": [
+			"Glu",
+			"E",
+			"גלוטמט",
+			"גלוטמאט"
+		]
+	},
+	{
+		"term": "Histidine",
+		"variants": [
+			"His",
+			"H",
+			"היסטידין"
+		]
+	},
+	{
+		"term": "Isoleucine",
+		"variants": [
+			"Ile",
+			"I",
+			"איזולוצין",
+			"איזוליצין"
+		]
+	},
+	{
+		"term": "Leucine",
+		"variants": [
+			"Leu",
+			"L",
+			"ליצין",
+			"לוצין"
+		]
+	},
+	{
+		"term": "Lysine",
+		"variants": [
+			"Lys",
+			"K",
+			"ליזין",
+			"לייזין"
+		]
+	},
+	{
+		"term": "Methionine",
+		"variants": [
+			"Met",
+			"M",
+			"מתיונין"
+		]
+	},
+	{
+		"term": "Phenylalanine",
+		"variants": [
+			"Phe",
+			"F",
+			"פנילאלנין",
+			"פניל אלנין"
+		]
+	},
+	{
+		"term": "Proline",
+		"variants": [
+			"Pro",
+			"P",
+			"פרולין"
+		]
+	},
+	{
+		"term": "Serine",
+		"variants": [
+			"Ser",
+			"S",
+			"סרין",
+			"סירין"
+		]
+	},
+	{
+		"term": "Threonine",
+		"variants": [
+			"Thr",
+			"T",
+			"תראונין"
+		]
+	},
+	{
+		"term": "Tryptophan",
+		"variants": [
+			"Trp",
+			"W",
+			"טריפטופן",
+			"טריפטופאן"
+		]
+	},
+	{
+		"term": "Tyrosine",
+		"variants": [
+			"Tyr",
+			"Y",
+			"טירוזין"
+		]
+	},
+	{
+		"term": "Valine",
+		"variants": [
+			"Val",
+			"V",
+			"ואלין",
+			"וואלין",
+			"וולין"
+		]
+	},
+	{
+		"term": "Bohr",
+		"variants": "בוהר"
+	},
+	{
+		"term": "effect",
+		"variants": "אפקט"
+	},
+	{
+		"term": "McArdle's",
+		"variants": [
+			"McArdle",
+			"מקרדל",
+			"מקארדל"
+		]
+	},
+	{
+		"term": "thermogenesis",
+		"variants": [
+			"תרמוגנזה",
+			"תרמוגנזיס",
+			"טרמוגנזה",
+			"טרמוגנזיס"
+		]
 	}
 ]

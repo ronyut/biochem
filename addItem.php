@@ -106,5 +106,6 @@ require("inc/header.php");
     });
     </script>
     <script src="js/editor.js"></script>
+    <?php require("inc/footer.php"); ?>
 </body>
 </html>

@@ -149,10 +149,13 @@ if(!isset($is_index)) {
             <a class="nav-link" href="<?=$BASE_URL?>">שחזורים</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">שינויים אחרונים <i class="fas fa-history"></i></a>
+            <a class="nav-link" href="changes.php">שינויים אחרונים <i class="fas fa-history"></i></a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="addItem.php">הוספת שאלה +</a>
+            <a class="nav-link" href="addItem.php">הוספת שאלה <i class="fas fa-plus"></i></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="help.php">עזרה <i class="fas fa-question-circle"></i></a>
           </li>
         </ul>
         <div class="navbar-nav" style="margin-right: auto;">
@@ -162,11 +165,11 @@ if(!isset($is_index)) {
                 </a>
                 <div class="dropdown-menu dropdown-menu-right dropdown-user">
                     <?php if ($logged) { ?>
-                    <a href="#" class="dropdown-item"><i class="fas fa-user-cog"></i> הגדרות</a>
+                    <a href="inc/makeJson/jsoner.php" target="_blank" class="dropdown-item"><i class="fas fa-sync"></i> רענון אינדקסים</a>
                     <?php } ?>
                     <a href="#" class="dropdown-item"><i class="fas fa-print"></i> גרסת הדפסה</a>
                     <!--<a href="#" class="dropdown-item"><i class="fas fa-grimace"></i> בחן את עצמך</a>-->
-                    <a href="#" class="dropdown-item"><i class="fas fa-question-circle"></i> עזרה ואודות</a>
+                    <a href="help.php" class="dropdown-item"><i class="fas fa-question-circle"></i> עזרה</a>
                     <!--<a href="#" class="dropdown-item"><i class="fas fa-signature"></i> אודות</a>-->
                     <div class="dropdown-divider"></div>
                     <?php if ($logged) { ?>

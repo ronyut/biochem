@@ -15,7 +15,7 @@ switch($_GET['action']){
         Add a tag
     */
     case "addTag":
-        if(!isset($_POST["tag"]) || empty($_POST["tag"])) {
+        if(!isset($_POST["tag"]) || empty($_POST["tag"]) || !$USER || $USER["isEditor"] == 0) {
             $status["success"] = false;
             break;
         }
@@ -195,6 +195,23 @@ switch($_GET['action']){
             $item = array("action" => $row["actionType"], "entity" => $row["entityType"],
                           "userID" => (int) $row["userID"], "userFullName" => $fullName, "content" => $row["content"],
                           "pid" => (int) $row["pid"] , "time" => $row["time"]);
+            array_push($json, $item);
+        }
+        echo json_encode($json, JSON_UNESCAPED_UNICODE);
+        exit;
+        break;
+    /*
+        get all History
+    */    
+    case "getAllHistory":
+        $json = array();
+        $query = query("SELECT * FROM history ORDER BY hID DESC");
+        while($row = mysqli_fetch_array($query)){
+            $user = getUserByID($row["userID"]);
+            $fullName = $user["firstName"]." ".$user["lastName"];
+            $item = array("action" => $row["actionType"], "entity" => $row["entityType"],
+                          "userID" => (int) $row["userID"], "userFullName" => $fullName, "content" => $row["content"],
+                          "pid" => (int) $row["pid"], "qid" => (int) $row["qid"], "time" => $row["time"]);
             array_push($json, $item);
         }
         echo json_encode($json, JSON_UNESCAPED_UNICODE);
