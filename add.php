@@ -99,6 +99,7 @@ if(isset($_POST["add"])) {
         pop("no right answer");
     }
     
+    $answerOf = "NULL";
     foreach($phrases as $phrase) {
         if ($phrase == "") {
             continue;
@@ -141,7 +142,7 @@ if(isset($_POST["add"])) {
         }
         
         query("INSERT INTO phrases (phraseName, answerOf, isQuestion, isRight, comment)
-               VALUES ('$onlyPhrase', NULL, $isQuestion, $isAns, '$comment');
+               VALUES ('$onlyPhrase', $answerOf, $isQuestion, $isAns, '$comment');
                $addSql");
          
                

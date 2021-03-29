@@ -140,6 +140,8 @@ function showHistory() {
                 output += action + "את התשובה"
             } else if (entity == "T") {
                 output += action + "את התגית"
+            } else if (entity == "C") {
+                output += action + "את ההערה"
             } else if (entity == "U") {
                 
             }
@@ -162,6 +164,10 @@ function charToAction(c) {
         action = "ערכ/ה ";
     } else if (c == "D") {
         action = "מחק/ה ";
+    } else if (c == "H") {
+        action = "הסתיר/ה ";
+    } else if (c == "S") {
+        action = "חשפ/ה ";
     }
     
     return action;

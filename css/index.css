@@ -21,23 +21,6 @@ article h2 {
     font-size: 26px;
 }
 
-.correct
-{
-    color: green;
-}
-
-.incorrect
-{
-    color: grey;
-}
-
-.red
-{
-    color: red;
-    font-weight: bold;
-    
-}
-
 .tags-search-wrapper {
     padding: 2rem 1rem;
     background-color: #e9ecef;
@@ -101,19 +84,6 @@ article h2 {
     display: none;
     z-index:100000;
     border: 1px solid rgba(0, 0, 0, 0.27);
-}
-
-.dropdown-user {
-    text-align: right;
-}
-
-.dropdown-toggle::after {
-    display: block;
-}
-
-nav img {
-    border: none !important;
-    background: none !important;
 }
 
 .dropdown-results{

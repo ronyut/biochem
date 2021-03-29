@@ -3,22 +3,6 @@ body{
     text-align:right;
 }
 
-.correct
-{
-    color: green;
-}
-
-.incorrect
-{
-    color: grey;
-}
-
-.red
-{
-    color: red;
-    font-weight: bold;
-}
-
 footer {
     padding: 2rem 1rem;
     background-color: #e9ecef;
@@ -44,4 +28,16 @@ h2 {
 iframe{
     border: 0;
     margin-top: 50px;
+}
+
+.article-container{
+    margin-top: 50px;
+}
+
+.fa-eye-slash{
+    color:red;
+}
+
+.toggle-question-visibility{
+    cursor: pointer;
 }

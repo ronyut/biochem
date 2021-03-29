@@ -124,4 +124,41 @@ $(document).on('mousedown', '.bootstrap-tagsinput .tag', function (e) {
     }
 });
 
+// toggle question visibility
+$(document).on('click', '.toggle-question-visibility', function(event) {
+    let qid = $(this).closest(".article-container").attr("pid");
+    let el = $(this);
+
+    let toggle = 1;
+    if ($(this).attr("toggle") == 1) {
+        toggle = 0;
+    }
+
+    $.ajax({
+        method: "POST",
+        url: "inc/ajax.php?action=toggleQuestionVisibility",
+        data: { qid: qid, toggle: toggle },
+        dataType: 'json',
+        success: function (msg) {
+            if (msg.success) {
+                $(el).attr("toggle", msg.is_hidden);
+
+                if (msg.is_hidden == 1) {
+                    $(el).removeClass("fa-eye").addClass("fa-eye-slash");
+                }
+                else {
+                    $(el).removeClass("fa-eye-slash").addClass("fa-eye");
+                }
+            } else {
+                console.log("Error toggling: " + msg);
+                alert("Error toggling visibility");
+            }
+            
+        },
+        error: function(msg) {
+            alert("No response");
+        }
+    });
+});
+
 

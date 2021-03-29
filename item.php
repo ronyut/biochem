@@ -6,7 +6,7 @@ require("inc/functions.php");
 $id = (int) $_GET['id'];
 $questionName = getValueFromDB("SELECT * FROM phrases WHERE pID = $id AND isQuestion = 1", "phraseName");
 if (!$questionName) {
-    header("Location: ".PAGE_NOT_FOUND);
+    die("Question with this ID does not exist!");
 }
 
 $pageTitle = $questionName;
@@ -20,6 +20,12 @@ require("inc/header.php");
     $tags = getTagsByPid($id, false);
     //$tagsStr = implode(",", array_values($tags));
     ?>
+    <hr>
+    <div class="for-editors">
+        <small class="form-text text-muted">טיפ: תוכל לסמן תשובה כנכונה/לא נכונה על ידי לחיצה על Ctrl וקליק ימני בעכבר</small>
+        <small id="questionHelp" class="form-text text-muted">עוד טיפ: תוכל להוסיף הערה ע"י הוספת שני לוכסנים (//) בסוף הטקסט ולאחריהם להזין את ההערה. כדי לראות את ההערה יש לרפרש את הדף</small>
+    </div>
+    <br />
     </div>
     <footer class="tags-container">
         <input class="tags-input" pid="<?=$id?>" type="text" data-role="tagsinput">
@@ -36,6 +42,7 @@ require("inc/header.php");
         }
         ?>
         </div>
+        <small class="form-text text-muted for-editors">אם יש לך הרשאות עריכה, תוכל להוסיף כאן תגיות לשאלה שיעזרו לך למצוא אותה בקלות אחר כך</small>
     </footer>
     <div class="iframe"></div>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>

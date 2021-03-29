@@ -133,7 +133,7 @@
         }
         
         $i = 0;
-        $query = query("SELECT * FROM phrases WHERE answerOf = $id ORDER BY pID ASC");
+        $query = query("SELECT * FROM phrases WHERE answerOf = $id OR pID = $id ORDER BY pID ASC");
         while($row = mysqli_fetch_array($query)){
             // question
             if ($i == 0) {
@@ -145,16 +145,31 @@
                     }
                 }
                 
-                echo "<hr><article><h1>";
+                echo "<hr><article><div class='row'><div class='col-md-11'><h1>";
                 if ($index != null) {
                     echo $index.'. ';
                 }
+
+                $is_hidden = "";
+                if($row["is_hidden"]) {
+                    $is_hidden = "-slash";
+                }
+
                 echo "<span class='question phrase' $editable pid='".$row['pID']."'
                         hash='".md5($row["phraseName"])."' >".$name."</span></h1>
+                        </div>
+                        <div class='col-md-1' style='text-align: center;'>
+                            <i title='הסתר/חשוף שאלה' toggle='".$row['is_hidden']."' class='fas fa-eye".$is_hidden." toggle-question-visibility'></i>
+                        </div>
+                        </div>
                         <hr>
                         <ol>";
                 
             } else {
+                if ($row['is_hidden'] == 1) {
+                    continue;
+                }
+
                 // answer
                 $classAnswer = "incorrect";
                 if ($row['isRight'] == 1) {
@@ -165,7 +180,7 @@
                       hash='".md5($row["phraseName"])."'>".$row['phraseName']."</span></li></h2>";
             }
             
-            if ($row["comment"] != "") {
+            if ($row["comment"] != "" && $row['is_hidden'] == 0) {
                 echo "<div class='alert alert-warning comment' $editable hash='".md5($row["comment"])."'
                         pid='".$row['pID']."' role='alert'>".$row['comment']."</div>";
             }
@@ -418,7 +433,7 @@
         global $USER;
         
         if(!in_array($actionType, ACTION_TYPES) || !in_array($entityType, ENTITY_TYPES)) {
-            die("addHistory: Wrong action/entity type");
+            die("addHistory: Wrong action/entity type: ". $actionType . " - ". $entityType);
         }
         
         $userID = 0;

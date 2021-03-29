@@ -87,6 +87,49 @@ if(!isset($is_index)) {
         text-align: right;
         margin: .125rem -80 0;
     }
+
+    .dropdown-user {
+        text-align: right;
+    }
+
+    .dropdown-toggle::after {
+        display: block;
+    }
+
+    nav img {
+        border: none !important;
+        background: none !important;
+    }
+
+    .correct
+    {
+        color: green;
+    }
+
+    .incorrect
+    {
+        color: grey;
+    }
+
+    .red
+    {
+        color: red;
+        font-weight: bold;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    <?php if ($isEditable == "true") { ?>
+    .for-editors {
+        display: block;
+    }
+    <?php } else { ?>
+    .for-editors {
+        display: none;
+    } 
+    <?php } ?>
     </style>
 
     <title><?=$pageTitle?></title>
@@ -122,9 +165,9 @@ if(!isset($is_index)) {
                     <a href="#" class="dropdown-item"><i class="fas fa-user-cog"></i> הגדרות</a>
                     <?php } ?>
                     <a href="#" class="dropdown-item"><i class="fas fa-print"></i> גרסת הדפסה</a>
-                    <a href="#" class="dropdown-item"><i class="fas fa-grimace"></i> בחן את עצמך</a>
-                    <a href="#" class="dropdown-item"><i class="fas fa-question-circle"></i> עזרה</a>
-                    <a href="#" class="dropdown-item"><i class="fas fa-signature"></i> אודות</a>
+                    <!--<a href="#" class="dropdown-item"><i class="fas fa-grimace"></i> בחן את עצמך</a>-->
+                    <a href="#" class="dropdown-item"><i class="fas fa-question-circle"></i> עזרה ואודות</a>
+                    <!--<a href="#" class="dropdown-item"><i class="fas fa-signature"></i> אודות</a>-->
                     <div class="dropdown-divider"></div>
                     <?php if ($logged) { ?>
                     <a href="#"class="dropdown-item" role="logout"><i class="fas fa-sign-out-alt"></i> התנתק</a>

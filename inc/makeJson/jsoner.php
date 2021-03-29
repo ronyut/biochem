@@ -20,7 +20,7 @@ foreach($json as $group) {
 
 $results = array();
 
-$query = query("SELECT * FROM phrases");  // <<<---------------@@@@@@@@@@@
+$query = query("SELECT * FROM phrases WHERE is_hidden = 0");  // <<<---------------@@@@@@@@@@@
 while($row = mysqli_fetch_array($query)) {
     $text = trimmer($row["phraseName"]);
     $replace = [",", "-", "?", ".", "(", ")", "+", ":", "=", "/", "\\"];
@@ -58,7 +58,7 @@ while($row = mysqli_fetch_array($query)) {
         }
     }
         
-    $id = $row["answerOf"];
+    $id = $row["answerOf"] ? $row["answerOf"] : $row["pID"];
     if(!array_key_exists($id, $results)){
         $results[$id] = array();
     }
