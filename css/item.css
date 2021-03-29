@@ -41,3 +41,22 @@ iframe{
 .toggle-question-visibility{
     cursor: pointer;
 }
+
+#new-answer.for-editors:hover span {
+    display:none;
+}
+
+#new-answer.for-editors:hover:before{
+    content:"+ לחץ כדי להוסיף תשובה חדשה";
+    color:aqua;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#tips u:hover + ol {
+    display:block;
+}
+
+#tips ol{
+    display:none;
+}

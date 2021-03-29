@@ -20,29 +20,40 @@ require("inc/header.php");
     $tags = getTagsByPid($id, false);
     //$tagsStr = implode(",", array_values($tags));
     ?>
+    <small id="new-answer" class="for-editors form-text text-muted">
+        <span>+</span>
+    </small>
     <hr>
-    <div class="for-editors">
-        <small class="form-text text-muted">טיפ: תוכל לסמן תשובה כנכונה/לא נכונה על ידי לחיצה על Ctrl וקליק ימני בעכבר</small>
-        <small id="questionHelp" class="form-text text-muted">עוד טיפ: תוכל להוסיף הערה ע"י הוספת שני לוכסנים (//) בסוף הטקסט ולאחריהם להזין את ההערה. כדי לראות את ההערה יש לרפרש את הדף</small>
-    </div>
     <br />
     </div>
     <footer class="tags-container">
         <input class="tags-input" pid="<?=$id?>" type="text" data-role="tagsinput">
         <br>
         <div class="hidden">
-        <?php
-        $i = 1;
-        foreach($tags as $tagID => $tagName) {
-            echo '<h2>'.$tagName.'</h2>';
-            if(sizeof($tags) != $i) {
-                echo ' <span class="bullet">•</span> ';
+            <?php
+            $i = 1;
+            foreach($tags as $tagID => $tagName) {
+                echo '<h2>'.$tagName.'</h2>';
+                if(sizeof($tags) != $i) {
+                    echo ' <span class="bullet">•</span> ';
+                }
+                $i++;
             }
-            $i++;
-        }
-        ?>
+            ?>
         </div>
-        <small class="form-text text-muted for-editors">אם יש לך הרשאות עריכה, תוכל להוסיף כאן תגיות לשאלה שיעזרו לך למצוא אותה בקלות אחר כך</small>
+        <div id="tips" class="for-editors">
+            <small class="form-text text-muted">
+                <u>לחץ כדי לראות טיפים לעריכת שאלה</u>
+                <ol>
+                    <li>תוכל להוסיף כאן תגיות לשאלה שיעזרו לך למצוא אותה בקלות אחר כך</li>
+                    <li>תוכל לסמן תשובה כנכונה/לא נכונה על ידי לחיצה על Ctrl וקליק ימני בעכבר</li>
+                    <li>תוכל להוסיף הערה ע"י הוספת שני לוכסנים (//) בסוף הטקסט ולאחריהם להזין את ההערה. כדי לראות את ההערה יש לרפרש את הדף</li>
+                    <li>כדי להפוך את השאלה למוסתרת, לחץ על העין שמשמאל לשאלה למעלה</li>
+                    <li>כדי למחוק תשובה, פשוט מחק את התוכן שלה ורענן את הדף</li>
+                    <li>כדי להוסיף תשובה חדשה, לחץ על סימן הפלוס שמתחת לתשובות</li>
+                </ol>
+            </small>
+        </div>
     </footer>
     <div class="iframe"></div>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>

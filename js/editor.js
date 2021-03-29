@@ -161,4 +161,29 @@ $(document).on('click', '.toggle-question-visibility', function(event) {
     });
 });
 
+// add new answer
+$(document).on('click', '#new-answer', function(event) {
+    let qid = $(this).closest(".article-container").attr("pid");
+    let el = $(this);
+
+    $.ajax({
+        method: "POST",
+        url: "inc/ajax.php?action=addNewAnswer",
+        data: { qid: qid },
+        dataType: 'json',
+        success: function (msg) {
+            if (msg.success) {
+                let html = `<h2 class="incorrect"><li><span class="answer phrase" contenteditable="true" pid="`+msg.pid+`" hash="">ערוך תשובה...</span></li></h2>`;
+                $(".article-container ol").append(html);
+            } else {
+                console.log("Error adding: " + msg);
+                alert("Error adding");
+            }
+            
+        },
+        error: function(msg) {
+            alert("No response");
+        }
+    });
+});
 

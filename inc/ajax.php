@@ -94,15 +94,15 @@ switch($_GET['action']){
             // add comment
             if(contains($clean_html, $commentMarker)) {
                 $phrase = explode($commentMarker, $clean_html);
-                $onlyPhrase = trimmer(escape($phrase[0]));
-                $comment = trimmer(escape($phrase[1]));
+                $onlyPhrase = trimmer($phrase[0]);
+                $comment = trimmer($phrase[1]);
                 query("UPDATE phrases SET phraseName = '$onlyPhrase', comment = '$comment' WHERE pID=$pid");
                 addHistory("Edit", $entity, $onlyPhrase, array("qid" => $qid, "pid" => $pid));
                 break;
             }
         }
         
-        $escaped = trimmer(escape($clean_html));
+        $escaped = trimmer($clean_html);
         
         query("UPDATE phrases SET $column = '$escaped' WHERE pID=$pid");
         
@@ -358,6 +358,18 @@ switch($_GET['action']){
         }
         addHistory($op, "Question", "", array("qid" => $qid));
 
+        break;
+    /*
+    Add new answer
+    */
+    case "addNewAnswer":
+        $qid = (int) $_POST["qid"];
+        query("INSERT INTO phrases (phraseName, answerOf, comment) VALUES ('', $qid, '')");
+        $pid = mysqli_insert_id($db);
+        
+        addHistory("Add", "Phrase", "", array("qid" => $qid, "pid" => $pid));
+
+        $status["pid"] = $pid;
         break;
     default:
         $status["success"] = false;

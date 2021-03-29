@@ -8,6 +8,7 @@ if(!isset($_GET['qid'])) {
 }
 
 $qid = (int) $_GET['qid'];
+$questionName = getValueFromDB("SELECT * FROM phrases WHERE pID = $qid AND isQuestion = 1", "phraseName");
 
 ?>
 <html lang="he">
@@ -19,7 +20,7 @@ $qid = (int) $_GET['qid'];
     <link rel="icon" href="img/favicon.png">
     <link href="https://netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 
-    <title>תגובות</title>
+    <title><?=$questionName?></title>
     
     <style>
     @import url(https://fonts.googleapis.com/earlyaccess/opensanshebrew.css);
