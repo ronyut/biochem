@@ -48,7 +48,7 @@ iframe{
 
 #new-answer.for-editors:hover:before{
     content:"+ לחץ כדי להוסיף תשובה חדשה";
-    color:aqua;
+    color:grey;
     text-decoration: underline;
     cursor: pointer;
 }

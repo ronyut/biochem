@@ -4,9 +4,13 @@
 		Global Vars
 	**************************************************************/
 	$USER = getLoggedUser();
-    $ROOT_PATH = getProtocol()."://$_SERVER[HTTP_HOST]";
-    $BASE_PATH = getProtocol()."://$_SERVER[HTTP_HOST]"."/biochem";
-    $ACTUAL_LINK = $ROOT_PATH.$_SERVER["REQUEST_URI"];
+    $ROOT_URL = getProtocol()."://$_SERVER[HTTP_HOST]"."/";
+    $BASE_URL = $ROOT_URL;
+    $ACTUAL_LINK = $ROOT_URL.$_SERVER["REQUEST_URI"];
+
+    if ($SERVER_NAME == "localhost") {
+        $BASE_URL .= "biochem/";
+    }
 
     /**************************************************************
 		isSecureConn
@@ -133,7 +137,7 @@
         }
         
         $i = 0;
-        $query = query("SELECT * FROM phrases WHERE answerOf = $id OR pID = $id ORDER BY pID ASC");
+        $query = query("SELECT * FROM phrases WHERE (answerOf = $id OR pID = $id) ORDER BY pID ASC");
         while($row = mysqli_fetch_array($query)){
             // question
             if ($i == 0) {
@@ -159,14 +163,16 @@
                         hash='".md5($row["phraseName"])."' >".$name."</span></h1>
                         </div>
                         <div class='col-md-1' style='text-align: center;'>
-                            <i title='הסתר/חשוף שאלה' toggle='".$row['is_hidden']."' class='fas fa-eye".$is_hidden." toggle-question-visibility'></i>
+                            <div class='for-editors'>
+                                <i title='הסתר/חשוף שאלה' toggle='".$row['is_hidden']."' class='fas fa-eye".$is_hidden." toggle-question-visibility'></i>
+                            </div>
                         </div>
                         </div>
                         <hr>
                         <ol>";
                 
             } else {
-                if ($row['is_hidden'] == 1) {
+                if ($row['is_hidden'] == 1 && empty($row['phraseName'])) {
                     continue;
                 }
 
@@ -197,7 +203,7 @@
     function getOneItemJson($id, $index, $isEditable) {
         $i = 0;
         $json = array();
-        $query = query("SELECT * FROM phrases WHERE pID = $id OR answerOf = $id ORDER BY pID ASC");
+        $query = query("SELECT * FROM phrases WHERE (answerOf = $id OR pID = $id) AND is_hidden = 0 ORDER BY pID ASC");
         while($row = mysqli_fetch_array($query)){  
             $json[$i]["comment"] = $row["comment"];
             $json[$i]["pid"] = (int) $row["pID"];

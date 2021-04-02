@@ -3,7 +3,7 @@
 require("inc/config.php");
 require("inc/functions.php");
 
-$pageTitle = "הוספת שאלה חדשה";
+$pageTitle = "הוספת שאלה חדשה | השחזורון";
 $styleCSS = "addItem.css";
 require("inc/header.php");
 
@@ -106,6 +106,5 @@ require("inc/header.php");
     });
     </script>
     <script src="js/editor.js"></script>
-    <?php require("inc/footer.php"); ?>
 </body>
 </html>

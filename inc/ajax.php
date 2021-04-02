@@ -125,7 +125,7 @@ switch($_GET['action']){
         $pid = (int) $_POST["pid"];
         $text = escape($_POST["text"]);
         
-         if (!$USER || $USER["isEditor"] == 0) {
+		if (!$USER || $USER["isEditor"] == 0) {
             $status["success"] = false;
             break;
         }
@@ -349,10 +349,17 @@ switch($_GET['action']){
             $sql = "INSERT INTO phrases (phraseName, answerOf, isQuestion, isRight, comment)
                     VALUES ('$onlyPhrase', $qid, 0, $isCorrect, '$comment')";
             query($sql);
-
+			
+			$pid = mysqli_insert_id($db);
+			
             // add answer to history
-            addHistory("Add", "Phrase", $onlyPhrase, array("qid" => $qid, "pid" => mysqli_insert_id($db)));
+            addHistory("Add", "Phrase", $onlyPhrase, array("qid" => $qid, "pid" => $pid));
 
+			if ($isCorrect) {
+				// add correct answer to history
+				addHistory("Add", "Answer", $onlyPhrase, array("qid" => $qid, "pid" => $pid));
+			}
+			
             $i++;
         }
 
@@ -364,9 +371,14 @@ switch($_GET['action']){
     Hide question ("remove" it)
     */
     case "toggleQuestionVisibility":
+		if (!$USER || $USER["isEditor"] == 0) {
+            $status["success"] = false;
+            break;
+        }
+		
         $qid = (int) $_POST["qid"];
         $toggle = (int) $_POST["toggle"];
-        query("UPDATE phrases SET is_hidden = $toggle WHERE pID = $qid AND isQuestion = 1");
+        query("UPDATE phrases SET is_hidden = $toggle WHERE answerOf = $qid");
         $status["is_hidden"] = $toggle;
         
         $op = "Show";
@@ -380,6 +392,11 @@ switch($_GET['action']){
     Add new answer
     */
     case "addNewAnswer":
+		if (!$USER || $USER["isEditor"] == 0) {
+            $status["success"] = false;
+            break;
+        }
+		
         $qid = (int) $_POST["qid"];
         query("INSERT INTO phrases (phraseName, answerOf, comment) VALUES ('', $qid, '')");
         $pid = mysqli_insert_id($db);

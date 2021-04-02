@@ -56,7 +56,7 @@ if($editable){
 }
 
 if (!isset($pageTitle)) {
-    $pageTitle = "ביוכימיה - שחזורים";
+    $pageTitle = "השחזורון - ביוכימיה | בר אילן";
 }
 
 if(isset($styleCSS)) {
@@ -69,12 +69,20 @@ if(!isset($is_index)) {
     $is_index = "hidden";
 }
 
+if(!isset($showNavBar)) {
+    $showNavBar = "";
+}
+
 ?>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="utf-8">
     <meta name="keywords" content="">
-    <meta name="description" content="">
+    <meta name="description" content='שחזורים בקורס בביוכימיה (27202) של ד"ר יוליה פנסו מכל השנים של מדעי המוח, בר אילן'>
+	<meta property="og:title" content="השחזורון בביוכימיה - מדעי המוח בר אילן" />
+	<meta property="og:url" content="<?=$BASE_URL?>" />
+	<meta property="og:description" content='שחזורים בקורס בביוכימיה (27202) של ד"ר יוליה פנסו מכל השנים של מדעי המוח, בר אילן'>
+	<meta property="og:image" content="<?=$BASE_URL?>img/favicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="img/favicon.png">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
@@ -138,8 +146,8 @@ if(!isset($is_index)) {
 
 <body>
     <!-- navbar -->
-    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-      <a class="navbar-brand" href="<?=$BASE_URL?>">ביוכימיה <img src="img/favicon.png" border="0" width="40" height="40"></a>
+    <nav class="<?=$showNavBar?> navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+      <a class="navbar-brand" href="<?=$BASE_URL?>">השחזורון <img src="img/favicon.png" border="0" width="40" height="40"></a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -155,7 +163,7 @@ if(!isset($is_index)) {
             <a class="nav-link" href="addItem.php">הוספת שאלה <i class="fas fa-plus"></i></a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="help.php">עזרה <i class="fas fa-question-circle"></i></a>
+            <a class="nav-link" href="print.php">גרסת הדפסה <i class="fas fa-print"></i></a>
           </li>
         </ul>
         <div class="navbar-nav" style="margin-right: auto;">
@@ -167,7 +175,8 @@ if(!isset($is_index)) {
                     <?php if ($logged) { ?>
                     <a href="inc/makeJson/jsoner.php" target="_blank" class="dropdown-item"><i class="fas fa-sync"></i> רענון אינדקסים</a>
                     <?php } ?>
-                    <a href="#" class="dropdown-item"><i class="fas fa-print"></i> גרסת הדפסה</a>
+					<a href="index.php?heat" class="dropdown-item"><i class="fas fa-thermometer-half"></i> תצוגה חמה</a>
+                    <a href="print.php" class="dropdown-item"><i class="fas fa-print"></i> גרסת הדפסה</a>
                     <!--<a href="#" class="dropdown-item"><i class="fas fa-grimace"></i> בחן את עצמך</a>-->
                     <a href="help.php" class="dropdown-item"><i class="fas fa-question-circle"></i> עזרה</a>
                     <!--<a href="#" class="dropdown-item"><i class="fas fa-signature"></i> אודות</a>-->

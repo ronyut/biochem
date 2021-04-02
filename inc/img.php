@@ -6,7 +6,7 @@ header ('Content-Type: image/png');
 
 if(!isset($_GET['userID'])) {
     $id = 0; // anonymous
-    $prefix = $BASE_PATH."/";
+    $prefix = $BASE_URL;
 } else {
     $id = (int) $_GET['userID'];
     $prefix = "";

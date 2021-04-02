@@ -3,7 +3,7 @@
 require("inc/config.php");
 require("inc/functions.php");
 
-$pageTitle = "עזרה";
+$pageTitle = "עזרה | השחזורון";
 $styleCSS = "addItem.css";
 require("inc/header.php");
 

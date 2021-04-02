@@ -532,3 +532,90 @@ function loadAllQuestions(isEditable) {
         pageLoaded(isEditable == "true");
     });
 }
+
+function getPrintableQuestions() {
+    
+    $.get("inc/ajax.php?action=getAllQuestions", function(data) {
+        let i = 0;
+        let output = "";
+        $.each(data, function(index, item) {
+            $.each(item, function(index2, phrase) {
+                let pid = phrase.pid;
+                let name = phrase.name;
+                let comment = phrase.comment;
+                let type = phrase.type;
+                  
+				name = replaceTerms(name);
+				
+                // question
+                if(type == "q") {
+                    let qid = pid;
+                    output += `<div class='article-container' pid='`+qid+`'>
+                                <article>
+                                <h1>
+									<span class='question phrase' pid='`+qid+`'>`+name+`</span>
+								</h1>
+                                <ol>
+                                `;
+                } else {
+                    let classAnswer = "incorrect";
+                    if(phrase.correct) {
+                        classAnswer = "correct";
+                    }
+                    output += `<h2 class='`+classAnswer+`'><li><span class='answer phrase' pid='`+pid+`'>`+name+`</span></li></h2>`;
+                }
+                if(comment != ""){
+                    output += `<div class='alert alert-warning comment'
+                            pid='`+pid+`' role='alert'>`+replaceTerms(comment)+`</div>`;
+                }
+                
+                i++;
+            });
+            
+            output += `     </ol></article>
+                        </div>`;
+        });
+        $("#articles").html(output);
+		$("#loader").hide();
+		$("#settings").show();
+    });
+}
+
+function printPage(color) {
+	// black and white
+	if (color == "bw") {
+		$(".correct").addClass("bw");
+		$(".red").addClass("bw");
+	}
+	else {
+		$(".bw").removeClass("bw");
+	}
+}
+
+function toggleComments(el) {
+	if(el.checked) {
+		$(".comment").addClass("hidden");
+	} else {
+		$(".comment").removeClass("hidden");
+	}
+}
+
+
+function replaceTerms(name) {
+	let result = name;
+	result = result.replaceAll("CO2", "CO<sub>2</sub>");
+	result = result.replaceAll("FADH2", "FADH<sub>2</sub>");
+
+	return result;
+}
+
+
+
+
+
+
+
+
+
+
+

@@ -9,7 +9,7 @@ $json = json_decode($json);
 $text = trimmer(escape($_POST["query"]));
 $replace = [",", "-", "?", ".", "(", ")", "+", ":", "="];
 $clean = str_replace($replace, " ", $text);
-$clean = str_replace("'", "", $text);
+$clean = str_replace("'", "", $clean);
 $clean = trimmer($clean);
 $words = explode(" ", $clean);
 

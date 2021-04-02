@@ -13,7 +13,7 @@ $google_client->setClientId('767593746677-3d9c6eelr0cltbs3pugem219e81ppooc.apps.
 $google_client->setClientSecret('Z9FM2yADNYfLzxgxpoNsQf_h');
 
 //Set the OAuth 2.0 Redirect URI
-$google_client->setRedirectUri(getProtocol().'://'.$SERVER_NAME.'/biochem/');
+$google_client->setRedirectUri($BASE_URL);
 
 //
 $google_client->addScope('email');

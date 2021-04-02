@@ -3,7 +3,7 @@
 require("inc/config.php");
 require("inc/functions.php");
 
-$pageTitle = "עזרה";
+$pageTitle = "שינויים אחרונים | השחזורון";
 $styleCSS = "addItem.css";
 require("inc/header.php");
 
@@ -24,7 +24,7 @@ require("inc/header.php");
             </thead>
             <tbody id="history_tbody">
                 <tr>
-                    <td colspan="4">פול גז בניוטרל?</td>
+                    <td colspan="5">פול גז בניוטרל?</td>
                 </tr>
             </tbody>
             </table>
