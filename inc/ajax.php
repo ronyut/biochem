@@ -416,6 +416,7 @@ switch($_GET['action']){
 		$json[0] = [];
 		$json[0]["tid"] = 0;
 		$json[0]["name"] = "כללי";
+		$json[0]["group"] = 0;
 		
 		
 		$sql = "SELECT * FROM `tag2phrase`
@@ -445,6 +446,7 @@ switch($_GET['action']){
 				$json[$i]["tid"] = $row["tagID"];
 				$json[$i]["name"] = $row["tagName"];
 				$json[$i]["qids"] = [];
+				$json[$i]["group"] = $row["is_primary"];
 			}
 			
 			$json[$i]["qids"][] = $row["pID"];

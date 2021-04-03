@@ -30,4 +30,6 @@ printing page: DONE
 	- option to hide comments
 when new question is added log the correct answer in history DONE
 add authority check to visibility toggling of a question + answer adding DONE
-fixed critical bug in makeJson.php
+fixed critical bug in makeJson.php DONE
+order question in print view by titles DONE
+combine titles of same group DONE

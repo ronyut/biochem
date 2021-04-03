@@ -534,23 +534,30 @@ function loadAllQuestions(isEditable) {
 }
 
 
-var mapTitles = {};
+var mapTitlesToGroups = {};
 function getTitles() {
 	$("#articles").hide();
 	$.get("inc/ajax.php?action=getAllTitles", function(data) {
 		let i = 0;
         let output = ``;
         $.each(data, function(i, tag) {
-			let tid = tag.tid;
+			let gid = tag.group;
 			let tagName = tag.name;
-			output += `<div class='article-container tag-title' tid='`+tid+`'><h1>~ ` + tagName + ` ~</h1></div>`;
+			
+			if ($("[gid="+gid+"]").length > 0) {
+				$("[gid="+gid+"] h1 span").append(" + " + tagName);
+				
+			} else {
+				output += `<div class='article-container tag-title' gid='`+gid+`'><h1>~ <span>` + tagName + `</span> ~</h1></div>`;
+				$("#articles").append(output);
+				output = "";
+			}
 			
 			$.each(tag.qids, function(i2, qid) {
-				mapTitles[qid] = tid;
+			mapTitlesToGroups[qid] = gid;
 			});
 		});
 		
-		$("#articles").append(output);
 		getPrintableQuestions("titles");
 	});
 }
@@ -603,11 +610,11 @@ function getPrintableQuestions(orderBy) {
 						
 			
 			if (orderBy == "titles") {
-				let tid = 0;
-				if (qid in mapTitles) {
-					tid = mapTitles[qid];
+				let gid = 0;
+				if (qid in mapTitlesToGroups) {
+					gid = mapTitlesToGroups[qid];
 				}
-				$("#articles .article-container[tid="+ tid +"]").after(output);
+				$("#articles .article-container[gid="+ gid +"]").after(output);
 				output = "";
 			}
 			
