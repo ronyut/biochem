@@ -73,6 +73,11 @@ if(isset($_GET["order"]) && $_GET['order'] == "time") {
 	.tag-title h1 {
 		text-align:center;
 	}
+	
+	.mr-30{
+		margin-right: 30px;
+		display: inline;
+	}
 	</style>
 	
     <div class="page-wrapper">
@@ -94,6 +99,10 @@ if(isset($_GET["order"]) && $_GET['order'] == "time") {
 				<br>
 				<input class="form-check-input" type="checkbox" value="1" id="hideComments" onchange="toggleComments(this)">
 				<label class="form-check-label" for="hideComments">    הסתר הערות</label>
+				<div class="mr-30">
+					<input class="form-check-input" type="checkbox" value="1" id="hideNumbering" onchange="toggleNumbering(this)">
+					<label class="form-check-label" for="hideNumbering">    הסתר מספור</label>
+				</div>
 			</div>
 		</div>
         <div id="articles"></div>

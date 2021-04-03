@@ -186,9 +186,14 @@
                       hash='".md5($row["phraseName"])."'>".$row['phraseName']."</span></li></h2>";
             }
             
+			$comment = $row["comment"];
+			if (!$isEditable) {
+				$comment = formatComment($row["comment"]);
+			}
+			
             if ($row["comment"] != "" && $row['is_hidden'] == 0) {
                 echo "<div class='alert alert-warning comment' $editable hash='".md5($row["comment"])."'
-                        pid='".$row['pID']."' role='alert'>".$row['comment']."</div>";
+                        pid='".$row['pID']."' role='alert'>".$comment."</div>";
             }
                         
             $i++;
@@ -205,7 +210,7 @@
         $json = array();
         $query = query("SELECT * FROM phrases WHERE (answerOf = $id OR pID = $id) AND is_hidden = 0 ORDER BY pID ASC");
         while($row = mysqli_fetch_array($query)){  
-            $json[$i]["comment"] = $row["comment"];
+            $json[$i]["comment"] = formatComment($row["comment"]);
             $json[$i]["pid"] = (int) $row["pID"];
             
             // question
@@ -630,5 +635,14 @@
             //query("UPDATE users SET photo = '' WHERE userID = '$userID'");
         }
     }
+
+	/*
+		formatComment:
+		replace @{qid} with a link to the question
+	*/
+	function formatComment($comment) {
+		$comment = preg_replace("/@(\d+)/", "<a href='item.php?id=$1'>$1</a>", $comment);
+        return $comment;
+	}
 
 ?>

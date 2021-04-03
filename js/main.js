@@ -623,6 +623,10 @@ function getPrintableQuestions(orderBy) {
         $("#articles").show();
 		$("#loader").hide();
 		$("#settings").show();
+		
+		if (orderBy == "titles") {
+			addNumberOrderedListToQuestion();
+		}
     });
 }
 
@@ -645,22 +649,28 @@ function toggleComments(el) {
 	}
 }
 
-
+// replace chemical terms
 function replaceTerms(name) {
 	let result = name;
 	result = result.replaceAll("CO2", "CO<sub>2</sub>");
 	result = result.replaceAll("FADH2", "FADH<sub>2</sub>");
+	result = result.replaceAll("O2", "O<sub>2</sub>");
 
 	return result;
 }
 
+function addNumberOrderedListToQuestion() {
+	let questions = $(".question");
+	$.each(questions, function(i, q){
+		let index = i + 1;
+		$(q).prepend("<span class='numbering'>" + index + ". </span>");
+	});
+}
 
-
-
-
-
-
-
-
-
-
+function toggleNumbering(box) {
+	if(box.checked) {
+		$(".numbering").addClass("hidden");
+	} else {
+		$(".numbering").removeClass("hidden");
+	}
+}
