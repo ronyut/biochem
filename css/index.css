@@ -3,6 +3,13 @@ body{
     padding: 90px 50px;
 }
 
+@media (max-width:960px) {
+	body{
+		text-align:right;
+		padding: 90px 20px;
+	}
+}
+
 .page-wrapper{
     direction: rtl;
 }

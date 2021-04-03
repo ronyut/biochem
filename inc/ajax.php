@@ -170,15 +170,17 @@ switch($_GET['action']){
         getAllQuestions
     */
     case "getAllQuestions":
-        $json = array();
-        $i = 1;
-        $query = query("SELECT * FROM phrases WHERE isQuestion = 1 AND is_hidden = 0");
-        while($row = mysqli_fetch_array($query)){
-            $qid = $row['pID'];
-            $isEditable = isset($_GET['editable']) && $_GET['editable'] == "true";
-            $item = getOneItemJson($qid, $i, $isEditable);
-            array_push($json, $item);
-        }
+		$json = array();
+
+		$i = 1;
+		$query = query("SELECT * FROM phrases WHERE isQuestion = 1 AND is_hidden = 0");
+		while($row = mysqli_fetch_array($query)){
+			$qid = $row['pID'];
+			$isEditable = isset($_GET['editable']) && $_GET['editable'] == "true";
+			$item = getOneItemJson($qid, $i, $isEditable);
+			array_push($json, $item);
+		}
+
         echo json_encode($json, JSON_UNESCAPED_UNICODE);
         exit;
         break;
@@ -405,6 +407,54 @@ switch($_GET['action']){
 
         $status["pid"] = $pid;
         break;
+		
+	/*
+    Add all titles for print page
+    */
+    case "getAllTitles":
+		$json = array();
+		$json[0] = [];
+		$json[0]["tid"] = 0;
+		$json[0]["name"] = "כללי";
+		
+		
+		$sql = "SELECT * FROM `tag2phrase`
+				INNER JOIN tags ON tags.tagID = tag2phrase.tagID
+				WHERE tags.is_primary != 0
+				GROUP BY pID
+				ORDER BY `tags`.`is_primary` ASC";
+		$query = query($sql);
+		
+		$isFirst = 1;
+		$i = 1;
+		$lastTagID = 0;
+		
+		while($row = mysqli_fetch_array($query)){
+			if ($isFirst == 1) {
+				$lastTagID = $row["tagID"];
+				$isFirst = 0;
+			}
+			
+			if ($row["tagID"] != $lastTagID) {
+				$lastTagID = $row["tagID"];
+				$i++;
+			}
+			
+			if (!key_exists($i, $json)) {
+				$json[$i] = [];
+				$json[$i]["tid"] = $row["tagID"];
+				$json[$i]["name"] = $row["tagName"];
+				$json[$i]["qids"] = [];
+			}
+			
+			$json[$i]["qids"][] = $row["pID"];
+			
+		}
+		
+		echo json_encode($json, JSON_UNESCAPED_UNICODE);
+        exit;
+		
+		break;
     default:
         $status["success"] = false;
         break;

@@ -35,6 +35,13 @@ if(isset($_GET["code"]))
     }
 }
 
+if(isset($_GET["login"])) {
+	$hash = $_GET["login"];
+	setcookie(COOKIE_HASH_NAME, $hash, time() + 3600 * 24 * 365 * 10, "/");
+	header("Location: index.php");
+	exit();
+}
+
 // This is for check user has login into system by using Google account, if User not login into system then it will execute if block of code and make code for display Login link for Login using Google account.
 $logged = true;
 if(!isset($_COOKIE[COOKIE_HASH_NAME]))
@@ -45,6 +52,12 @@ if(!isset($_COOKIE[COOKIE_HASH_NAME]))
  $logged = false;
 } else {
     $user = getLoggedUser();
+	if (!$user) {
+		// remove cookie
+		setcookie(COOKIE_HASH_NAME, "", time() - time(), "/");
+		unset($user);
+		header("Location: index.php");
+	}
     $user_image = $user["photo"];
 }
 

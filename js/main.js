@@ -533,12 +533,38 @@ function loadAllQuestions(isEditable) {
     });
 }
 
-function getPrintableQuestions() {
-    
-    $.get("inc/ajax.php?action=getAllQuestions", function(data) {
+
+var mapTitles = {};
+function getTitles() {
+	$("#articles").hide();
+	$.get("inc/ajax.php?action=getAllTitles", function(data) {
+		let i = 0;
+        let output = ``;
+        $.each(data, function(i, tag) {
+			let tid = tag.tid;
+			let tagName = tag.name;
+			output += `<div class='article-container tag-title' tid='`+tid+`'><h1>~ ` + tagName + ` ~</h1></div>`;
+			
+			$.each(tag.qids, function(i2, qid) {
+				mapTitles[qid] = tid;
+			});
+		});
+		
+		$("#articles").append(output);
+		getPrintableQuestions("titles");
+	});
+}
+
+
+
+
+function getPrintableQuestions(orderBy) {
+	
+    $.get("inc/ajax.php?action=getAllQuestions&orderBy=" + orderBy, function(data) {
         let i = 0;
         let output = "";
         $.each(data, function(index, item) {
+			let qid;
             $.each(item, function(index2, phrase) {
                 let pid = phrase.pid;
                 let name = phrase.name;
@@ -549,7 +575,7 @@ function getPrintableQuestions() {
 				
                 // question
                 if(type == "q") {
-                    let qid = pid;
+                    qid = pid;
                     output += `<div class='article-container' pid='`+qid+`'>
                                 <article>
                                 <h1>
@@ -574,8 +600,20 @@ function getPrintableQuestions() {
             
             output += `     </ol></article>
                         </div>`;
+						
+			
+			if (orderBy == "titles") {
+				let tid = 0;
+				if (qid in mapTitles) {
+					tid = mapTitles[qid];
+				}
+				$("#articles .article-container[tid="+ tid +"]").after(output);
+				output = "";
+			}
+			
         });
-        $("#articles").html(output);
+        $("#articles").append(output);
+        $("#articles").show();
 		$("#loader").hide();
 		$("#settings").show();
     });

@@ -570,7 +570,7 @@
             $user = getUserByHash($_COOKIE[COOKIE_HASH_NAME]);
         }
         
-        if($user != null) {
+        if($user != null && $user["banned"] == 0) {
             return $user;
         } else {
             return false;

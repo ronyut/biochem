@@ -7,6 +7,10 @@ require("inc/config.php");
 require("inc/functions.php");
 require("inc/header.php");
 
+$order = "titles";
+if(isset($_GET["order"]) && $_GET['order'] == "time") {
+	$order = "time";
+}
   
 ?>
 	<style>
@@ -65,6 +69,10 @@ require("inc/header.php");
 		color: black !important;
 		text-decoration: underline;
 	}
+	
+	.tag-title h1 {
+		text-align:center;
+	}
 	</style>
 	
     <div class="page-wrapper">
@@ -79,6 +87,11 @@ require("inc/header.php");
 				<button class="btn btn-primary" onclick="printPage('rgb');">גרסה למדפסת צבעונית</button>
 				<button class="btn btn-success" onclick="window.print();">הדפס</button>
 				<br><br>
+				<select onchange="window.location='print.php?order='+this.value" style="width:250px" class="form-control" aria-label="סדר שאלות לפי">
+					<option value="titles" <?php echo $order == "titles" ? "selected" : "" ?>>סדר לפי כותרות</option>
+					<option value="time" <?php echo $order == "time" ? "selected" : "" ?>>סדר הוספה (כמו בדף הראשי)</option>
+				</select>
+				<br>
 				<input class="form-check-input" type="checkbox" value="1" id="hideComments" onchange="toggleComments(this)">
 				<label class="form-check-label" for="hideComments">    הסתר הערות</label>
 			</div>
@@ -94,7 +107,12 @@ require("inc/header.php");
 	<script src="js/jquery.md5.js"></script>
 	<script src="js/main.js"></script>
 	<script>
-    getPrintableQuestions();
+	let order = "<?=$order?>";
+    if (order == "time") {
+		getPrintableQuestions(order);
+	} else {
+		getTitles();
+	}
     </script>
 </body>
 </html>
