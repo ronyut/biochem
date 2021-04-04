@@ -463,7 +463,7 @@
         $qid = "NULL";
         if(isset($ids["qid"])) {
             $qid = $ids["qid"];
-            if ($qid == $pid) {
+            if ($qid == $pid && $entityType != "C") {
                 $entityType = "Q";
             }
         }

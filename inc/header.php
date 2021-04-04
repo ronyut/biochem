@@ -86,7 +86,65 @@ if(!isset($showNavBar)) {
     $showNavBar = "";
 }
 
+$links = array(
+				array(
+					  "title" => "שינויים אחרונים",
+					  "link" => "changes.php",
+					  "icon" => "history",
+					  "is_nav" => true,
+					 ),
+				array(
+					  "title" => "הוספת שאלה",
+					  "link" => "addItem.php",
+					  "icon" => "plus",
+					  "is_nav" => true
+					 ),
+				array(
+					  "title" => "גרסת הדפסה",
+					  "link" => "print.php",
+					  "icon" => "print",
+					  "is_nav" => true
+					 ),
+				array(
+					  "title" => "רענון אינדקסים",
+					  "link" => "inc/makeJson/jsoner.php",
+					  "icon" => "sync",
+					  "is_logged" => true,
+					  "target_blank" => true
+					 ),
+				array(
+					  "title" => "תצוגה חמה",
+					  "link" => "index.php?heat",
+					  "icon" => "thermometer-half"
+					 ),
+				array(
+					  "title" => "עזרה",
+					  "link" => "help.php",
+					  "icon" => "question-circle"
+					 ),
+				array(
+					  "title" => "אודות",
+					  "link" => "https://drive.google.com/file/d/19jdYj2MpBxosb8ygppVr1w4MyfTqA75N/view?usp=sharing",
+					  "icon" => "signature",
+					  "target_blank" => true
+					 ),
+				array(
+					  "title" => "התנתק",
+					  "link" => "#",
+					  "icon" => "sign-out-alt",
+					  "is_logged" => true,
+					  "role" => "logout"
+					 ),
+				array(
+					  "title" => "התחבר",
+					  "link" => $login_url,
+					  "icon" => "sign-in-alt",
+					  "is_logged" => false
+					 )
+			  );
+
 ?>
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="utf-8">
@@ -104,18 +162,17 @@ if(!isset($showNavBar)) {
     <?=$styleCSS?>
 
     <style>
-    .dropdown-menu {
-        text-align: right;
-        margin: .125rem -80 0;
-    }
 
-    .dropdown-user {
-        text-align: right;
-    }
-
-    .dropdown-toggle::after {
-        display: block;
-    }
+	@media (min-width: 768px) {
+		.dropdown-menu {
+			text-align:right;
+			margin-right: -120%;
+		}
+	}
+	
+	.dropdown-menu {
+		text-align:right;
+	}
 
     nav img {
         border: none !important;
@@ -166,18 +223,17 @@ if(!isset($showNavBar)) {
       </button>
       <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav">
-          <li class="nav-item active">
-            <a class="nav-link" href="<?=$BASE_URL?>">שחזורים</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="changes.php">שינויים אחרונים <i class="fas fa-history"></i></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="addItem.php">הוספת שאלה <i class="fas fa-plus"></i></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="print.php">גרסת הדפסה <i class="fas fa-print"></i></a>
-          </li>
+			<?php
+			foreach($links as $link) {
+				if (!isset($link["is_nav"])) { continue; }
+				if (isset($link["is_logged"]) && $link["is_logged"] && !$logged) { continue; }
+				if (isset($link["is_logged"]) && !$link["is_logged"] && $logged) { continue; }
+				
+			?>
+			<li class="nav-item">
+				<a class="nav-link" href="<?=$link["link"]?>"><?=$link["title"]?> <i class="fas fa-<?=$link["icon"]?>"></i></a>
+			</li>
+			<?php } ?>
         </ul>
         <div class="navbar-nav" style="margin-right: auto;">
               <div class="nav-item dropdown">
@@ -185,20 +241,20 @@ if(!isset($showNavBar)) {
                     <img src="<?=$user_image?>" width="40" height="40" class="img-responsive img-circle img-thumbnail">
                 </a>
                 <div class="dropdown-menu dropdown-menu-right dropdown-user">
-                    <?php if ($logged) { ?>
-                    <a href="inc/makeJson/jsoner.php" target="_blank" class="dropdown-item"><i class="fas fa-sync"></i> רענון אינדקסים</a>
-                    <?php } ?>
-					<a href="index.php?heat" class="dropdown-item"><i class="fas fa-thermometer-half"></i> תצוגה חמה</a>
-                    <a href="print.php" class="dropdown-item"><i class="fas fa-print"></i> גרסת הדפסה</a>
-                    <!--<a href="#" class="dropdown-item"><i class="fas fa-grimace"></i> בחן את עצמך</a>-->
-                    <a href="help.php" class="dropdown-item"><i class="fas fa-question-circle"></i> עזרה</a>
-                    <!--<a href="#" class="dropdown-item"><i class="fas fa-signature"></i> אודות</a>-->
-                    <div class="dropdown-divider"></div>
-                    <?php if ($logged) { ?>
-                    <a href="#"class="dropdown-item" role="logout"><i class="fas fa-sign-out-alt"></i> התנתק</a>
-                    <?php } else { ?>
-                    <a href="<?=$login_url?>" class="dropdown-item"><i class="fas fa-sign-in-alt"></i> התחבר</a>
-                    <?php } ?>
+					<?php
+					foreach($links as $link) {
+						if (isset($link["is_nav"])) { continue; }
+						if (isset($link["is_logged"]) && $link["is_logged"] && !$logged) { continue; }
+						if (isset($link["is_logged"]) && !$link["is_logged"] && $logged) { continue; }
+						
+					?>
+					<a href="<?=$link["link"]?>" 
+							<?php echo isset($link["role"]) ? 'role="'.$link["role"].'"' : "" ?>
+							<?php echo isset($link["target_blank"]) ? 'target="blank"' : "" ?>
+							class="dropdown-item"
+							>
+							<i class="fas fa-<?=$link["icon"]?>"></i> <?=$link["title"]?></a>
+					<?php } ?>
                 </div>
               </div>
 

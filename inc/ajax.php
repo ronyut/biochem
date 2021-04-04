@@ -101,14 +101,14 @@ switch($_GET['action']){
                 break;
             }
         }
-        
+        		
         $escaped = trimmer($clean_html);
         
         query("UPDATE phrases SET $column = '$escaped' WHERE pID=$pid");
         
         addHistory("Edit", $entity, $escaped, array("qid" => $qid, "pid" => $pid));
         
-        if ($column == "phraseName") {
+        if ($column == "phraseName" && $entity != "Question") {
             if (empty($escaped)) {
                 query("UPDATE phrases SET is_hidden = 1 WHERE pID=$pid");
             } else {
@@ -207,7 +207,7 @@ switch($_GET['action']){
     */    
     case "getAllHistory":
         $json = array();
-        $query = query("SELECT * FROM history ORDER BY hID DESC");
+        $query = query("SELECT * FROM history WHERE hID > 2078 OR entityType = 'Q' ORDER BY hID DESC");
         while($row = mysqli_fetch_array($query)){
             $user = getUserByID($row["userID"]);
             $fullName = $user["firstName"]." ".$user["lastName"];
@@ -451,6 +451,23 @@ switch($_GET['action']){
 			
 			$json[$i]["qids"][] = $row["pID"];
 			
+		}
+		
+		echo json_encode($json, JSON_UNESCAPED_UNICODE);
+        exit;
+		
+		break;
+	/*
+    getUsersPhotos
+    */
+    case "getUsersPhotos":
+		$json = array();
+		
+		$sql = "SELECT userID, photo FROM users";
+		$query = query($sql);
+		
+		while($row = mysqli_fetch_array($query)){
+			$json[] = array("uid" => (int) $row["userID"], "img" => $row["photo"]);
 		}
 		
 		echo json_encode($json, JSON_UNESCAPED_UNICODE);

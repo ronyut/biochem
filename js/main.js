@@ -451,7 +451,7 @@ function putTagsInFilterArea(order) {
             let color;
             
             if(order == "heat"){
-                color = this.color;
+                color = "#" + this.color;
             } else {
                 color = `rgb(0,255,`+(255 - i*1.5)+`)`;
             }
@@ -548,7 +548,7 @@ function getTitles() {
 				$("[gid="+gid+"] h1 span").append(" + " + tagName);
 				
 			} else {
-				output += `<div class='article-container tag-title' gid='`+gid+`'><h1>~ <span>` + tagName + `</span> ~</h1></div>`;
+				output += `<div class='article-container tag-title' gid='`+gid+`'><h1>~~~<br><span>` + tagName + `</span><br>~~~</h1></div>`;
 				$("#articles").append(output);
 				output = "";
 			}

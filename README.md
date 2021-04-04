@@ -28,8 +28,17 @@ printing page: DONE
 	- table arrangement
 	- fix chemical symbols (CO2 subtext becomes: CO_2)
 	- option to hide comments
+	- order question in print view by titles DONE
+	- combine titles of same group in print DONE
+	- add numbering to question DONE
+	- option to hide numbering DONE
+
 when new question is added log the correct answer in history DONE
 add authority check to visibility toggling of a question + answer adding DONE
 fixed critical bug in makeJson.php DONE
-order question in print view by titles DONE
-combine titles of same group DONE
+in comments: tag question by typing @{question id} then it will apear as a link DONE
+
+History(changes.php):
+	- reformatted and restyled so it looks like post and comments and not a big table
+	
+header links in navbar made more dynamic (with array)
