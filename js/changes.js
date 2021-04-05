@@ -154,5 +154,7 @@ function getUsersPhotos() {
 		$.each(data, function(key, value) {
 			users[this.uid] = this.img;
 		});
+		
+		showHistory();
 	});
 }
