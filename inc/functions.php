@@ -191,7 +191,7 @@
 				$comment = formatComment($row["comment"]);
 			}
 			
-            if ($row["comment"] != "" && $row['is_hidden'] == 0) {
+            if ($row["comment"] != "") {
                 echo "<div class='alert alert-warning comment' $editable hash='".md5($row["comment"])."'
                         pid='".$row['pID']."' role='alert'>".$comment."</div>";
             }

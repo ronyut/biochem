@@ -147,7 +147,7 @@ function showHistory(getAll = false) {
                 } else {
                     output += "הגדיר/ה את התשובה כלא נכונה"
                 }
-            } else if (entity == "Q" || pid == qid) {
+            } else if (entity == "Q") {
                 output += action + "את השאלה"
             } else if (entity == "P") {
                 output += action + "את התשובה"

@@ -45,7 +45,7 @@ function showHistory() {
 				qids.push(qid);
 			}
 			
-			if (entity == "Q") {
+			if (entity == "Q" && (actionKey == "A" || actionKey == "E")) {
 				let mainpost = $("article[qid="+qid+"] .main-post");
 				if (mainpost.attr("hasbody") == 0) {
 					mainpost.find(".main-post-body").html(content);
@@ -100,7 +100,7 @@ function getActionText(actionKey, entity, pid, qid) {
 		} else {
 			output += "הגדיר/ה את התשובה כלא נכונה"
 		}
-	} else if (entity == "Q" || pid == qid) {
+	} else if (entity == "Q") {
 		output += action + "את השאלה"
 	} else if (entity == "P") {
 		output += action + "את התשובה"

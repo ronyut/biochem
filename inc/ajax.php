@@ -98,6 +98,7 @@ switch($_GET['action']){
                 $comment = trimmer($phrase[1]);
                 query("UPDATE phrases SET phraseName = '$onlyPhrase', comment = '$comment' WHERE pID=$pid");
                 addHistory("Edit", $entity, $onlyPhrase, array("qid" => $qid, "pid" => $pid));
+                addHistory("Add", "Comment", $comment, array("qid" => $qid, "pid" => $pid));
                 break;
             }
         }
@@ -207,7 +208,7 @@ switch($_GET['action']){
     */    
     case "getAllHistory":
         $json = array();
-        $query = query("SELECT * FROM history WHERE hID > 2078 OR entityType = 'Q' ORDER BY hID DESC");
+        $query = query("SELECT * FROM history WHERE hID > 2131 OR entityType = 'Q' ORDER BY hID DESC");
         while($row = mysqli_fetch_array($query)){
             $user = getUserByID($row["userID"]);
             $fullName = $user["firstName"]." ".$user["lastName"];
@@ -219,79 +220,7 @@ switch($_GET['action']){
         echo json_encode($json, JSON_UNESCAPED_UNICODE);
         exit;
         break;
-    /*
-        Add a talkback
-    */
-    case "addTalkback":
-        if(!isset($_POST["talkback"]) || !isset($_POST["qid"])) {
-            $status["success"] = false;
-            break;
-        }
-        $qid = (int) $_POST['qid'];
-        
-        // HTML purifier
-        $clean_html = purifyHtml($_POST["talkback"]);
-        $talkback = trimmer(escape($clean_html));
-        
-        $replyToTalkbackID = "NULL";
-        $replyToUserID = "NULL";
-        if (isset($_POST['replyToTalkbackID']) && isset($_POST['replyToUserID'])) {
-            $replyToTalkbackID = (int) $_POST['replyToTalkbackID'];
-            $replyToUserID = (int) $_POST['replyToUserID'];
-        }
-        
-        $sql = "INSERT INTO talkbacks (userID, msg, underTalkback, qID, replyToUser) 
-                VALUES ('".$USER["userID"]."', '$talkback', $replyToTalkbackID, $qid, $replyToUserID)";
-        query($sql); 
-        $status["id"] = mysqli_insert_id($db);
-        break;
-    
-    /*
-        updateTalkback
-    */ 
-    case "updateTalkback":
-        if(!isset($_POST["talkback"]) || !isset($_POST["tbid"])) {
-            $status["success"] = false;
-            break;
-        }
-        $tbid = (int) $_POST['tbid'];
-        $talkback = purifyHtml($_POST["talkback"]);
-        
-        $sql = "UPDATE talkbacks SET msg = '$talkback' WHERE userID = ".$USER["userID"]." AND talkbackID = $tbid";
-        query($sql); 
-        
-        $status["clean"] = $talkback;
-        
-        break;
-    
-    /*
-        getTalkbacks
-    */    
-    case "getTalkbacks":
-        $json = array();
-        $qid = (int) $_GET["qid"];
-        $query = query("SELECT * FROM talkbacks WHERE qID = $qid ORDER BY underTalkback, talkbackID DESC");
-        while($row = mysqli_fetch_array($query)){
-            $user = getUserByID($row["userID"]);
-            $replyToUser = getUserByID($row["replyToUser"]);
-            $fullName = makeFullName($user);
-            $replyToUserFullName = makeFullName($replyToUser);
-            
-            $item = array("userID" => (int) $row["userID"],
-                          "id" => (int) $row["talkbackID"],
-                          "userFullName" => $fullName,
-                          "msg" => nl2br($row["msg"]),
-                          "underTalkback" => $row["underTalkback"], // don't add (int) so it cal be null
-                          "time" => date("d/m/Y H:i", strtotime($row["time"])),
-                          "photo" => $user["photo"],
-                          "replyToUserName" => $replyToUserFullName,
-                          "replyToUserID" => $row["replyToUser"] // don't add (int) so it cal be null
-                          );
-            array_push($json, $item);
-        }
-        echo json_encode($json, JSON_UNESCAPED_UNICODE);
-        exit;
-        break;
+		
     case "savePhoto":
         savePhoto($USER["photo"], $USER["userID"]);
         $status["photo"] = $USER["photo"];

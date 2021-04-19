@@ -80,6 +80,8 @@ if(isset($styleCSS)) {
 
 if(!isset($is_index)) {
     $is_index = "hidden";
+} else {
+	$is_index = "";
 }
 
 if(!isset($showNavBar)) {
@@ -164,7 +166,7 @@ $links = array(
     <style>
 
 	@media (min-width: 768px) {
-		.dropdown-menu {
+		.nav-item .dropdown-menu {
 			text-align:right;
 			margin-right: -120%;
 		}

@@ -41,6 +41,10 @@ article h2 {
     border-radius: 10px;
 }
 
+.tags-search button{
+	direction: inherit;
+}
+
 .tag-link{
     margin-top:3px;
     margin-right: 3px;
